@@ -8,10 +8,9 @@ from __future__ import unicode_literals
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
-sys.path.append("../../../../../../")
+sys.path.append("../../")
 
-from Research.Personal.EventDetection._2SplineEventDetector import \
-    _command_line_config,Detector
+from Code import _command_line_config,Detector
 
 def run():
     """
