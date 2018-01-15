@@ -2,8 +2,8 @@
 #pragma rtGlobals=3	
 
 #include "::Feather"
-#include "::::IgorCode:Util:PlotUtil"
-#pragma ModuleName = ModMainFEATHER
+#include ":::UtilIgorPro:Util:PlotUtil"
+#pragma ModuleName = ModMainFeather
 
 Static StrConstant DEF_INPUT_REL_TO_BASE =  "IgorUtil/PythonApplications/FEATHER/Example/feather_example.pxp"
 
