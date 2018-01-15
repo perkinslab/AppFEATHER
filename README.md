@@ -16,12 +16,12 @@ https://www.anaconda.com/download
 
 You will need the following libraries
 
-numpy
-scipy
+- numpy
+- scipy
 
 # Running
 
-Each language (Matlab, Python, and Igor Pro) has an example file which shows FEATHER working on a polyprotein force-extension curve. The files are located in App<X>, where <X> is the language name. In particular:
+Each language (Matlab, Python, and Igor Pro) has an example file which shows FEATHER working on a polyprotein force-extension curve. The files are located in AppYYY, where YYY is the language name. In particular:
 
 - Matlab: Run 'feather_example.m' in the AppMatlab folder
 - Igor Pro: Run 'Example/MainFEATHER.ipf' in the AppIgor folder
