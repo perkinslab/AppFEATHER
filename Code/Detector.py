@@ -6,12 +6,11 @@ import matplotlib.pyplot as plt
 import sys
 from scipy import signal,stats
 
-from Research.Personal.EventDetection.Util import Analysis,Plotting
+from Code import Analysis
 # XXX reduce import size below
-from Research.Personal.EventDetection._2SplineEventDetector._no_event import \
-    _min_points_between,_predict,\
+from _no_event import _min_points_between,_predict,\
     _probability_by_cheby_k,_no_event_chebyshev,_event_slices_from_mask
-from Research.Personal.EventDetection._2SplineEventDetector import _no_event
+import _no_event
 
 def get_slice_by_max_value(interp_sliced,offset,slice_list):
     """
@@ -315,13 +314,6 @@ def delta_mask_function(split_fec,slice_to_use,
                          min_points_between=min_points_between,    
                          get_best_slice_func=get_best_slice_func)
     boolean_ret = probability_updated < threshold
-    """
-    Plotting.debug_plot_signal_mask(x,force,gt_condition,x_sliced,interp_f,
-                           boolean_array,condition_non_events,
-                           boolean_ret,probability_updated,probability,
-                           threshold)
-    plt.show()
-    """
     return slice_to_use,boolean_ret,probability_updated
 
 def get_events_before_marker(marker_idx,event_mask,min_points_between):

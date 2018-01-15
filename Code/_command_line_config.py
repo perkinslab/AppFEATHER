@@ -9,11 +9,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
-from Research.Perkins.AnalysisUtil.ForceExtensionAnalysis import FEC_Util
-from GeneralUtil.python import GenUtilities
-from IgorUtil.PythonAdapter import PxpLoader,TimeSepForceObj
+from UtilForce.FEC import FEC_Util
+from UtilGeneral import GenUtilities
+from UtilIgor import PxpLoader,TimeSepForceObj
 import h5py
-import Detector
+from Code import Detector
 
 
 def read_matlab_file_into_fec(input_file):

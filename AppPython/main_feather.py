@@ -9,7 +9,7 @@ import os, sys,traceback
 path = os.path.abspath(os.path.dirname(__file__))
 os.chdir(path)
 sys.path.append('../')
-from code import _command_line_config
+from Code import _command_line_config
 
 import argparse
 

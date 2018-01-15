@@ -7,7 +7,7 @@ from __future__ import unicode_literals
 # This file is used for importing the common utilities classes.
 import numpy as np
 import matplotlib.pyplot as plt
-from Research.Personal.EventDetection.Util import Analysis
+from Code import Analysis
 from itertools import chain
 
 class prediction_info:
