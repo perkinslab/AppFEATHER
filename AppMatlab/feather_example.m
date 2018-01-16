@@ -4,9 +4,11 @@ function []=feather_example()
 
     Path must be set properly 
     %}
-    base = '/Users/patrickheenan/src_prh/Applications/AppFeather/';
+    delim = '/';
+    dir_str = strsplit(pwd,delim);
+    base = join(dir_str(1,1:end-1),delim);
 	% base_path should be correct if base is 
-    base_path = [base,'AppPython/'];
+    base_path = [base{1},'/AppPython/'];
     % read the input file
     input_csv = 'example.csv';
     data = csvread(input_csv);
