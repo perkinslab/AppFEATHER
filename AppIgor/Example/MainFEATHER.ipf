@@ -8,7 +8,7 @@
 #pragma ModuleName = ModMainFeather
 
 
-Static StrConstant DEF_PATH_NAME = "AppIgor"
+Static StrConstant DEF_PATH_NAME = "Example"
 Static StrConstant DEF_INPUT_REL_TO_BASE ="AppIgor:Example:feather_example.pxp"
 
 Static Function Main_Windows()
@@ -29,7 +29,7 @@ Static Function Main([base,input_file])
 	//		<base>DEF_INPUT_REL_TO_BASE
 	String base,input_file
 	if (ParamIsDefault(base))
-		base = ModIoUtil#pwd_igor_path(DEF_PATH_NAME,n_up_relative=2)
+		base = ModIoUtil#pwd_igor_path(DEF_PATH_NAME,n_up_relative=3)
 	EndIf
 	if (ParamIsDefault(input_file))
 		input_file  = base +DEF_INPUT_REL_TO_BASE
