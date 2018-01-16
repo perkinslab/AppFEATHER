@@ -7,7 +7,7 @@
 #include "::UtilIgorPro:Util:OperatingSystemUtil"
 
 
-Static StrConstant path_to_feather_folder = "Applications/AppFEATHER/AppPython/"
+Static StrConstant path_to_feather_folder = "AppPython/"
 Static StrConstant feather_file = "main_feather.py"
 
 Structure FeatherOutput

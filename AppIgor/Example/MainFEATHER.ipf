@@ -3,27 +3,34 @@
 
 #include "::Feather"
 #include ":::UtilIgorPro:Util:PlotUtil"
+#include ":::UtilIgorPro:Util:IoUtil"
+
 #pragma ModuleName = ModMainFeather
 
-Static StrConstant DEF_INPUT_REL_TO_BASE =  "IgorUtil/PythonApplications/FEATHER/Example/feather_example.pxp"
+
+Static StrConstant DEF_PATH_NAME = "AppIgor"
+Static StrConstant DEF_INPUT_REL_TO_BASE ="AppIgor:Example:feather_example.pxp"
 
 Static Function Main_Windows()
 	// Runs a simple IWT on patrick's windows setup
-	ModMainFEATHER#Main("C:/Users/pahe3165/src_prh/")
+	ModMainFEATHER#Main()
 End Function 
 
 Static Function Main_Mac()
 	// Runs a simple IWT on patrick's mac setup 
-	ModMainFEATHER#Main("/Users/patrickheenan/src_prh/")
+	ModMainFEATHER#Main()
 End Function
 
-Static Function Main(base,[input_file])
+Static Function Main([base,input_file])
 	// // This function shows how to use the IWT code
 	// Args:
 	//		base: the folder where the Research Git repository lives 
 	//		input_file: the pxp to load. If not present, defaults to 
 	//		<base>DEF_INPUT_REL_TO_BASE
 	String base,input_file
+	if (ParamIsDefault(base))
+		base = ModIoUtil#pwd_igor_path(DEF_PATH_NAME,n_up_relative=2)
+	EndIf
 	if (ParamIsDefault(input_file))
 		input_file  = base +DEF_INPUT_REL_TO_BASE
 	EndIf
@@ -57,5 +64,7 @@ Static Function Main(base,[input_file])
 		Variable event_idx = output.event_starts[i]
 		ModPlotUtil#axvline(X[event_idx])
 	endfor
+	ModPlotUtil#xlabel("Extension (m)")
+	ModPlotUtil#ylabel("Force (N)")
 	Edit output.event_starts as "Predicted Event Indices in Wave"
 End Function
