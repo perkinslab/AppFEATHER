@@ -23,7 +23,7 @@ python2 main_feather.py\
     -spring_constant 6.67e-3 \
     -trigger_time 0.382 \
     -dwell_time 0.992 \
-    -file_input ./UnitTest/example.csv \
+    -file_input ../Data/example.csv \
     -file_output ./output.txt \
 
 
