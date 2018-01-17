@@ -47,11 +47,13 @@ def run():
         "Programming error; FEATHEr methods are identical"
     # POST: they are consistent. go ahead and plot force vs time, add lines
     # where an event is predicted
+    print("Found events at indices: {}".format(event_indices_1))
     plt.plot(time,force*(-1))
     for i in event_indices_1:
         plt.axvline(time[i])
+    plt.xlabel("Time (s)")
+    plt.ylabel("Force (pN")
     plt.show()
-    print("Found events at indices: {:s}".format(event_indices_1))
     
 
 if __name__ == "__main__":

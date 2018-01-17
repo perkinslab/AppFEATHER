@@ -6,11 +6,11 @@ import matplotlib.pyplot as plt
 import sys
 from scipy import signal,stats
 
-from Code import Analysis
+from . import Analysis
 # XXX reduce import size below
-from _no_event import _min_points_between,_predict,\
+from ._no_event import _min_points_between,_predict,\
     _probability_by_cheby_k,_no_event_chebyshev,_event_slices_from_mask
-import _no_event
+from . import _no_event
 
 def get_slice_by_max_value(interp_sliced,offset,slice_list):
     """
