@@ -9,7 +9,7 @@
 
 
 Static StrConstant DEF_PATH_NAME = "Example"
-Static StrConstant DEF_INPUT_REL_TO_BASE ="AppIgor:Example:feather_example.pxp"
+Static StrConstant DEF_INPUT_REL_TO_BASE ="Data:feather_example.pxp"
 
 Static Function Main_Windows()
 	// Runs a simple IWT on patrick's windows setup

@@ -10,7 +10,7 @@ function []=feather_example()
 	% base_path should be correct if base is 
     base_path = [base{1},'/AppPython/'];
     % read the input file
-    input_csv = 'example.csv';
+    input_csv = '../Data/example.csv';
     data = csvread(input_csv);
     % get the individual columns, for plotting purposes
     time = data(:,1);
@@ -29,11 +29,14 @@ function []=feather_example()
     opt = feather_options(threshold,tau,base_path);
     % get the predicted event locations
     indices = feather(obj,opt); 
-    disp(indices)
+    disp('Events found at the following indices: ');
+    disp(indices);
     clf;
     hold all;
     plot(obj.time,obj.force*-1)
     for i=1:length(indices)
         plot(obj.time(indices(i)),obj.force(indices(i))*-1,'ro')
     end
+    xlabel('Time (s)');
+    ylabel('Force (N)');
 end
