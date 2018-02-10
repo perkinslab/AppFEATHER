@@ -222,9 +222,14 @@ class split_force_extension:
         offset_points = self.approach.Force.size-approach_idx
         # assume the surface is at the same point; convert from idx to real 
         # units by getting the ratio of separation differences 
-        grad_appr = np.gradient(self.approach.Zsnsr)
-        grad_retr = np.gradient(self.retract.Zsnsr)
-        sep_diff_median_ratio = abs(np.median(grad_retr)/np.median(grad_appr))
+        grad_appr = np.abs(np.gradient(self.approach.Zsnsr))
+        grad_retr = np.abs(np.gradient(self.retract.Zsnsr))
+        med_appr = np.nanmedian(grad_retr)
+        med_retr = np.nanmedian(grad_appr)
+        if (med_appr > 0):
+            sep_diff_median_ratio = med_retr/med_appr
+        else:
+            sep_diff_median_ratio = 1
         ratio = int(np.ceil(offset_points/sep_diff_median_ratio))
         """
         plt.subplot(2,1,1)
