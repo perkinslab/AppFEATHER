@@ -399,6 +399,12 @@ def _predict(x,y,n_points,interp,threshold,local_event_idx_function,
                     probability=probability_distribution,
                     threshold=threshold,
                     no_event_parameters_object=no_event_parameters_object)
+            if (res[0].start > res[0].stop):
+                bool_array = np.zeros(x.size)
+                probabilities = np.zeros(x.size)
+                slice_to_use = slice(0,x.size,1)
+                break
+            # POST: result is OK...
             slice_to_use,bool_array, probability_distribution = res
             # mask on probability distribution, to keep things consistent
             probabilities.append(probability_distribution)
