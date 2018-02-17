@@ -428,7 +428,12 @@ def _predict(x,y,n_points,interp,threshold,local_event_idx_function,
     remainder_split = [max(0,d) for d in delta_split_rem ]
     event_slices = [slice(event.start-remainder,event.stop+remainder,1)
                     for event,remainder in zip(event_slices,remainder_split)]
-    event_idx = [local_event_idx_function(x,y,e) for e in event_slices]
+    max_idx = x.size-1
+    event_idx = [min(max_idx,local_event_idx_function(x,y,e))
+                 for e in event_slices]
+    # make sure all the indices are in range.
+    event_slices = [slice(max(0,e.start),min(e.stop,max_idx+1))
+                     for e in event_slices]
     to_ret = prediction_info(event_idx = event_idx,
                              event_slices = event_slices,
                              local_stdev = stdevs,

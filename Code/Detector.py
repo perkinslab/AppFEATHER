@@ -24,8 +24,10 @@ def get_slice_by_max_value(interp_sliced,offset,slice_list):
     Returns:
         s in slice_list giving the maximum value in interp_sliced
     """
-    value_max = [max(interp_sliced[e.start-offset:e.stop-offset])
-                 for e in slice_list]
+    offset_slices = [slice(max(0,s.start-offset),max(s.stop-offset,0))
+                     for s in slice_list]
+    regions = [interp_sliced[e] for e in offset_slices]
+    value_max = [max(r) if r.size > 0 else -np.inf for r in regions]
     return np.argmax(value_max)
 
 def safe_reslice(original_boolean,original_probability,condition,
