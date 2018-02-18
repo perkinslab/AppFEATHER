@@ -363,9 +363,10 @@ def local_stdev(f,n):
 
 def filter_fec(obj,n_points):
     to_ret = copy.deepcopy(obj)
-    to_ret.Force = spline_interpolated_by_index(obj.Force,n_points)
-    to_ret.Separation = spline_interpolated_by_index(obj.Separation,n_points)
-    to_ret.ZSnsr = spline_interpolated_by_index(obj.ZSnsr,n_points)
+    if (n_points > 1):
+        to_ret.Force = spline_interpolated_by_index(obj.Force,n_points)
+        to_ret.Separation = spline_interpolated_by_index(obj.Separation,n_points)
+        to_ret.ZSnsr = spline_interpolated_by_index(obj.ZSnsr,n_points)
     return to_ret
 
 def bc_coeffs_load_force_2d(loading_true,loading_pred,bins_load,
