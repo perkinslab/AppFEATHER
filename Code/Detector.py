@@ -137,7 +137,8 @@ def f_average_and_diff(force,n):
         tuple of <local average, local diff>
     """
     size = int(np.ceil(int(n/2)))
-    half_size = int(np.ceil(int(size/2)))-1
+    half_size = max(int(np.ceil(int(size/2)))-1,1)
+    size = max(size,2*half_size+1)
     local_average = Analysis.local_average(force,size,
                                            size=size,origin=half_size)
     average_baseline = np.zeros(local_average.size)

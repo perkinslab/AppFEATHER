@@ -9,6 +9,8 @@ from scipy.stats import norm
 from scipy.ndimage.filters import uniform_filter1d,generic_filter1d
 from scipy.integrate import cumtrapz
 
+min_tau_num_points = 4
+
 class simple_fec:
     def __init__(self,time,z_sensor,separation,force,trigger_time,
                  dwell_time,events=[]):
@@ -128,7 +130,7 @@ class split_force_extension:
         Returns:
             nothing, sets tau appropriately
         """
-        self.tau_num_points_approach = tau_num_points
+        self.tau_num_points_approach = max(min_tau_num_points,tau_num_points)
     def set_tau_num_points(self,tau_num_points):
         """
         sets the autocorrelation time associated with this curve
@@ -138,11 +140,12 @@ class split_force_extension:
         Returns:
             Nothing
         """
-        self.tau_num_points = tau_num_points
+        # for the purpose of smoothing, tau must be a certain size
         if (tau_num_points is not None):
+            self.tau_num_points = max(min_tau_num_points, tau_num_points)
             # we assume the rate of time sampling is  the same everywhere
             self.dt = np.median(np.diff(self.approach.Time))
-            self.tau = self.dt*tau_num_points
+            self.tau = self.dt*self.tau_num_points
         else:
             self.tau = None
     def zero_retract_force(self,offset):
@@ -688,8 +691,10 @@ def spline_interpolator(tau_x,x,f,knots=None,deg=2):
     # to make it included
     if (knots is None):
         step_knots = tau_x/2
-        knots = np.arange(start=min(x),stop=max(x)+step_knots,
-                          step=step_knots)
+        min_x,max_x = min(x), max(x)
+        knots = np.linspace(start=min_x,stop=max_x,
+                            num=np.ceil((max_x-min_x)/step_knots),
+                            endpoint=True)
     # get the spline of the data
     spline_args = \
         dict(
