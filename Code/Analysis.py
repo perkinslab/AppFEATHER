@@ -234,11 +234,13 @@ class split_force_extension:
         # how far is the surface from the approach, in Z?
         dZ_surface = self.approach.Zsnsr[-1] - self.approach.Zsnsr[approach_idx]
         dZ_needed = abs(dZ_surface)
-        # what does that correspond to in retract indices?
-        # Z_retract_surface =
-        dZ_retract_per_pt= np.median(np.abs(np.gradient(self.retract.Zsnsr)))
-        retract_pts_needed = int(np.floor(dZ_needed/dZ_retract_per_pt))
-        return retract_pts_needed
+        # return the first time the retract is above the surface Z
+        dZ_retract = self.retract.ZSnsr - self.retract.ZSnsr[0]
+        where_retract_above_surface = np.where(dZ_retract  > dZ_needed)[0]
+        assert where_retract_above_surface.size > 0 , \
+            "Couldn't find surface in retract. Z_retract never reached surface."
+        # return the first time we are above the surface Z...
+        return where_retract_above_surface[0]
 
 def _index_surface_relative(x,offset_needed):
     """
