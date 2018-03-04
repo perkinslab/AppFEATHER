@@ -21,6 +21,15 @@ class simple_fec:
         self.TriggerTime = trigger_time
         self.DwellTime = dwell_time
         self.Events = events
+    def _slice(self,slice_v):
+        s = lambda x: x[slice_v].copy()
+        return simple_fec(time=s(self.Time),
+                          z_sensor=s(self.ZSnsr),
+                          separation=s(self.Separation),
+                          force=s(self.Force),
+                          trigger_time=self.TriggerTime,
+                          dwell_time=self.DwellTime,
+                          events=self.Events)
 
 class split_force_extension:
     """
@@ -222,31 +231,14 @@ class split_force_extension:
         Assuming this have been zeroed, get the predicted retract surface index
         """
         approach_idx = self.get_predicted_approach_surface_index()
-        offset_points = self.approach.Force.size-approach_idx
-        # assume the surface is at the same point; convert from idx to real 
-        # units by getting the ratio of separation differences 
-        grad_appr = np.abs(np.gradient(self.approach.Zsnsr))
-        grad_retr = np.abs(np.gradient(self.retract.Zsnsr))
-        med_appr = np.nanmedian(grad_retr)
-        med_retr = np.nanmedian(grad_appr)
-        if (med_appr > 0):
-            sep_diff_median_ratio = med_retr/med_appr
-        else:
-            sep_diff_median_ratio = 1
-        ratio = int(np.ceil(offset_points/sep_diff_median_ratio))
-        """
-        plt.subplot(2,1,1)
-        plt.plot(self.approach.Force)
-        plt.axvline(approach_idx)
-        plt.subplot(2,1,2)
-        n = self.approach.Force.size
-        plt.plot(self.retract.Force)
-        plt.axvline(n-approach_idx)
-        plt.axvline(ratio)
-        print(ratio)
-        plt.show()
-        """
-        return ratio
+        # how far is the surface from the approach, in Z?
+        dZ_surface = self.approach.Zsnsr[-1] - self.approach.Zsnsr[approach_idx]
+        dZ_needed = abs(dZ_surface)
+        # what does that correspond to in retract indices?
+        # Z_retract_surface =
+        dZ_retract_per_pt= np.median(np.abs(np.gradient(self.retract.Zsnsr)))
+        retract_pts_needed = int(np.floor(dZ_needed/dZ_retract_per_pt))
+        return retract_pts_needed
 
 def _index_surface_relative(x,offset_needed):
     """
@@ -567,12 +559,7 @@ def slice_func_fec(fec,slice_v):
     Returns:
         the sliced version of fec
     """
-    to_ret = copy.deepcopy(fec)
-    slice_f = lambda x: x[slice_v]
-    to_ret.Force = slice_f(to_ret.Force)
-    to_ret.Separation = slice_f(to_ret.Separation)
-    to_ret.ZSnsr = slice_f(to_ret.ZSnsr)
-    to_ret.Time = slice_f(to_ret.Time)
+    to_ret = fec._slice(slice_v)
     return to_ret
         
 def split_FEC_by_meta(time_sep_force_obj):
