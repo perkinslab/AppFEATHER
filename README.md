@@ -20,7 +20,7 @@ This will install FEATHER to the current directory.
 
 ## Dependencies
 
-Although FEATHER has interfaces for Matlab (tested with version 2017a), Igor (tested with 6.37 and 7.04), and Python (2.7), Python 2.7 is needed for FEATHER. The easiest way to install Python 2.7 and the dependencies is the free Anaconda:
+Although FEATHER has interfaces for Matlab (tested with version 2017b), Igor (tested with 6.37 and 7.04), and Python (tested with 2.7.14), Python 2.7 is needed for FEATHER. The easiest way to install Python 2.7 and the dependencies is the free Anaconda:
 
 https://www.anaconda.com/download
 
