@@ -41,8 +41,13 @@ You will need the following libraries
 Each language (Matlab, Python, and Igor Pro) has an example file which shows FEATHER working on a polyprotein force-extension curve. The files are located in AppYYY, where YYY is the language name. In particular:
 
 - Matlab: Run 'feather_example.m' in the AppMatlab folder
-- Igor Pro: Run 'Example/MainFEATHER.ipf' in the AppIgor folder
-- Python: Run 'main_unit_feather.py' from the AppPython/UnitTest folder
+- Igor Pro: 
+	- Open 'Example/MainFEATHER.ipf' in the AppIgor folder
+	- Run 'ModMainFeather#Main_Windows()' in the command window after compiling
+- Python:
+	- Run 'main_unit_feather.py' from the AppPython/UnitTest folder
+	- e.g. For windows type 'C:/ProgramData/Anaconda2/python main_unit_feather.py' without quotes for Windows in git bash
+
 
 
 
