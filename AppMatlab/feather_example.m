@@ -48,5 +48,5 @@ function []=feather_example()
         plot(obj.time(indices(i)),obj.force(indices(i))*conv,'ro')
     end
     xlabel('Time (s)');
-    ylabel('Force (N)');
+    ylabel('Force (pN)');
 end
