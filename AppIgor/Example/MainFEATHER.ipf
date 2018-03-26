@@ -40,7 +40,7 @@ Static Function Main([base,input_file])
 	Struct FeatherOptions opt
 	opt.tau = 0
 	opt.threshold = 1e-3
-	opt.tau = 2e-2
+	opt.tau = 1.5e-2
 	// Add the meta information
 	opt.trigger_time = 0.382
 	opt.dwell_time = 0.992
@@ -48,6 +48,7 @@ Static Function Main([base,input_file])
 	// add the file information
 	opt.meta.path_to_input_file = input_file
 	opt.meta.path_to_research_directory = base
+	opt.meta.path_to_python_binary = "C:/ProgramData/Anaconda2/python.exe"
 	// Make the output waves
 	Struct FeatherOutput output
 	Make /O/N=0, output.event_starts

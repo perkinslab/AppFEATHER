@@ -1,6 +1,6 @@
 # Description
 
-This repository contains FEATHER (Force Extension Analysis using a Testable Hypothesis for Event Recognition), a freely available technique for finding rupture events in force spectroscopy data.
+This repository contains FEATHER (*F*orce *E*xtension *A*nalysis using a *T*estable *H*ypothesis for *E*vent *R*ecognition), a freely available technique for finding rupture events in force spectroscopy data.
 
 # Citing FEATHER
 
@@ -10,16 +10,33 @@ xxx
 
 # Installing
 
-Although FEATHER has interfaces for Matlab (tested with version 2017a), Igor (tested with (6.37) and Python (2.7), Python 2.7 is needed for FEATHER. The easiest way to install Python 2.7 and the dependencies is the free Anaconda:
+## Getting the Repository
+
+To install, in git bash (for windows, https://git-scm.com/downloads) or Terminal (Mac/OS), type in the following:
+
+git clone --recurse-submodules https://github.com/prheenan/AppFEATHER.git
+
+This will install FEATHER to the current directory. 
+
+## Dependencies
+
+Although FEATHER has interfaces for Matlab (tested with version 2017a), Igor (tested with 6.37 and 7.04), and Python (2.7), Python 2.7 is needed for FEATHER. The easiest way to install Python 2.7 and the dependencies is the free Anaconda:
 
 https://www.anaconda.com/download
+
+Again, install python2.7 (*not* python3.4). For Matlab and Igor usage, FEATHER assumes there will be a python binary (or .exe for Windows) at:
+
+- "C:/ProgramData/Anaconda2/" (for Windows)
+- "//anaconda/bin/python2" (for MAC/Linux)
+
+As of 2018-3-26, the above paths are the default option for when Anaconda installs. If you install to a different location and use Matlab or Igor, you will need to update the relevant path in the ".m" or ".ipf" (see below).
 
 You will need the following libraries
 
 - numpy
 - scipy
 
-# Running
+# Running the example
 
 Each language (Matlab, Python, and Igor Pro) has an example file which shows FEATHER working on a polyprotein force-extension curve. The files are located in AppYYY, where YYY is the language name. In particular:
 

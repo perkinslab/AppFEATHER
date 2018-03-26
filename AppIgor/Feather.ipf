@@ -64,7 +64,7 @@ Static Function /S python_command(opt)
 	//		string to command, OS-specific
 	Struct FeatherOptions & opt
 	String PythonCommand
-	String python_str  = ModOperatingSystemUtil#python_binary_string()
+	String python_str  = ModOperatingSystemUtil#python_binary_string(opt.meta)
 	String FolderPath = ModFeather#full_path_to_feather_folder(opt)
 	String FullPath = ModFeather#full_path_to_feather_main(opt)
 	// Get just the python portion of the command
@@ -120,7 +120,7 @@ Static Function feather(user_options,output)
 	ModOperatingSystemUtil#get_updated_options(options.meta)
 	// Run the python code 
 	String PythonCommand = ModFeather#python_command(options)	
-	ModOperatingSystemUtil#execute_python(PythonCommand)
+	ModOperatingSystemUtil#execute_python(PythonCommand,options.meta)
 	Make /O/FREE/Wave wave_tmp = {output.event_starts}
 	ModOperatingSystemUtil#get_output_waves(wave_tmp,options.meta,skip_lines=2)
 End Function
