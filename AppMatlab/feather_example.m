@@ -27,16 +27,25 @@ function []=feather_example()
     % get the feather-specific options to use
     threshold = 1e-3;
     tau = 2e-2;
-    opt = feather_options(threshold,tau,base_path);
+    if (ismac)
+        python_binary = '//anaconda/bin/python2 ';
+    else
+        python_binary = 'C:/ProgramData/Anaconda2/python.exe ';        
+    end
+    opt = feather_options(threshold,tau,base_path,python_binary);
     % get the predicted event locations
     indices = feather(obj,opt); 
     disp('Events found at the following indices: ');
     disp(indices);
     clf;
     hold all;
-    plot(obj.time,obj.force*-1)
+    tmp_size = size(obj.force);
+    n_rounded = round(tmp_size(1)/10);
+    obj.force = obj.force - median(obj.force(1:n_rounded));
+    conv = -1e12;
+    plot(obj.time,obj.force*conv)
     for i=1:length(indices)
-        plot(obj.time(indices(i)),obj.force(indices(i))*-1,'ro')
+        plot(obj.time(indices(i)),obj.force(indices(i))*conv,'ro')
     end
     xlabel('Time (s)');
     ylabel('Force (N)');

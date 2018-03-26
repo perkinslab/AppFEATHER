@@ -19,9 +19,14 @@ function [indices] = feather(fec_obj,opt)
     output_file = [opt.base_path,'out.csv'];
     input_file = [opt.base_path,'main_feather.py'];
     save(matlab_file,'-struct','struct_to_save','-v7.3');
-    python_binary = 
-    [status,output] = system([python_binary ' --version'])
-    command = ['//anaconda/bin/python2.7 ',input_file];
+    python_binary = opt.python_binary;
+    [status,~] = system([python_binary ' --version']);
+    if (status ~= 0)
+       msg = ['Could not find python binary at ' python_binary '.'];
+       msg = [msg ' Please check the python location.'];
+       error(msg);
+    end
+    command = [python_binary ' ' input_file];
     command = append_numeric(command,...
                              '-spring_constant',fec_obj.spring_constant);
     command = append_numeric(command,...
