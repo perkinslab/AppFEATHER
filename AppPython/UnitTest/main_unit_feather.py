@@ -53,7 +53,7 @@ def run():
     for i in event_indices_1:
         plt.axvline(time[i])
     plt.xlabel("Time (s)")
-    plt.ylabel("Force (pN")
+    plt.ylabel("Force (pN)")
     plt.show()
     
 
