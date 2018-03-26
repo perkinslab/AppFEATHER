@@ -5,7 +5,8 @@ function []=feather_example()
     Path must be set properly 
     %}
     delim = '/';
-    dir_str = strsplit(pwd,delim);
+    pwd_res = pwd;
+    dir_str = strsplit(pwd_res,{delim,'\'},'CollapseDelimiters',true);
     base = join(dir_str(1,1:end-1),delim);
 	% base_path should be correct if base is 
     base_path = [base{1},'/AppPython/'];
