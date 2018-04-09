@@ -16,7 +16,7 @@ def run():
           "-dwell_time 0.992 ",
           "-file_input ../Data/example.csv ",
           "-file_output ./output.txt "]
-    call(["C:/ProgramData/Anaconda2/python.exe","main_feather.py",args])
+    call(["C:/ProgramData/Anaconda2/python.exe","main_feather.py",*args)
     events = np.loadtxt("./output.txt")
     data = np.loadtxt("../Data/example.csv", delimiter=",").T
     t, f = data[0], data[2]

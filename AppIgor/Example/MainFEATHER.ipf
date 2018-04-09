@@ -4,6 +4,8 @@
 #include "::Feather"
 #include ":::UtilIgorPro:Util:PlotUtil"
 #include ":::UtilIgorPro:Util:IoUtil"
+#include ":::UtilIgorPro:Util:OperatingSystemUtil"
+
 
 #pragma ModuleName = ModMainFeather
 
@@ -48,7 +50,7 @@ Static Function Main([base,input_file])
 	// add the file information
 	opt.meta.path_to_input_file = input_file
 	opt.meta.path_to_research_directory = base
-	opt.meta.path_to_python_binary = "C:/ProgramData/Anaconda2/python.exe"
+	opt.meta.path_to_python_binary = ModOperatingSystemUtil#def_python_binary_string()
 	// Make the output waves
 	Struct FeatherOutput output
 	Make /O/N=0, output.event_starts
