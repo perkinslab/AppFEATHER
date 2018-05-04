@@ -153,7 +153,7 @@ class split_force_extension:
         if (tau_num_points is not None):
             self.tau_num_points = max(min_tau_num_points, tau_num_points)
             # we assume the rate of time sampling is  the same everywhere
-            self.dt = np.median(np.diff(self.approach.Time))
+            self.dt = abs(np.median(np.diff(self.approach.Time)))
             self.tau = self.dt*self.tau_num_points
         else:
             self.tau = None
@@ -236,7 +236,7 @@ class split_force_extension:
         dZ_needed = abs(dZ_surface)
         # return the first time the retract is above the surface Z
         dZ_retract = self.retract.ZSnsr - self.retract.ZSnsr[0]
-        where_retract_above_surface = np.where(dZ_retract  > dZ_needed)[0]
+        where_retract_above_surface = np.where(dZ_retract >= dZ_needed)[0]
         assert where_retract_above_surface.size > 0 , \
             "Couldn't find surface in retract. Z_retract never reached surface."
         # return the first time we are above the surface Z...

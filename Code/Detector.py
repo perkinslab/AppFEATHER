@@ -642,6 +642,7 @@ def make_event_parameters_from_split_fec(split_fec,**kwargs):
                          derivative_sigma   = derivative_sigma,
                          epsilon=epsilon,sigma=sigma,**kwargs)
     return approach_dict                           
+	
                          
 def _predict_helper(split_fec,threshold,remasking_functions,**kwargs):
     """
@@ -700,6 +701,21 @@ def _predict_functor(example,f):
     """
     return lambda *args,**kwargs : f(example,*args,**kwargs)
 
+def _predict_split_fec(example_split,threshold,f_refs=None,**kwargs):
+    """
+    :param f_refs:  see _predict_full
+    :param example_split: split_fec to predict based on
+    :param threshold: minimum probability
+    :param kwargs: see _predict_helper
+    :return: prediction_info object
+    """
+    if (f_refs is None):
+        f_refs = [adhesion_mask_function_for_split_fec,delta_mask_function]
+    funcs = [ _predict_functor(example_split,f) for f in f_refs]
+    final_dict = dict(remasking_functions=funcs,
+                      threshold=threshold,**kwargs)
+    pred_info = _predict_helper(example_split,**final_dict)
+    return pred_info
 
 def _predict_full(example,threshold=1e-2,f_refs=None,tau_fraction=0.02,
                   **kwargs):
@@ -714,13 +730,8 @@ def _predict_full(example,threshold=1e-2,f_refs=None,tau_fraction=0.02,
     example_split = Analysis.\
         zero_and_split_force_extension_curve(example,
                                              fraction=tau_fraction)            
-    if (f_refs is None):
-        f_refs = [adhesion_mask_function_for_split_fec,delta_mask_function]
-    funcs = [ _predict_functor(example_split,f) for f in f_refs]
-    final_dict = dict(remasking_functions=funcs,
-                      threshold=threshold,**kwargs)
-    pred_info = _predict_helper(example_split,**final_dict)
-    return example_split,pred_info
+    pred_info = _predict_split_fec(example_split,threshold,f_refs=f_refs,**kwargs)
+    return example_split, pred_info
 
 def predict(example,threshold=1e-2,add_offsets=False,**kwargs):
     """
