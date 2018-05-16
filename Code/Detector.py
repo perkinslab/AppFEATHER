@@ -711,10 +711,18 @@ def _predict_split_fec(example_split,threshold,f_refs=None,**kwargs):
     """
     if (f_refs is None):
         f_refs = [adhesion_mask_function_for_split_fec,delta_mask_function]
+    # save copies to restore...
+    retract_orig = example_split.retract._slice(slice(0,None,1))
+    dwell_orig = example_split.dwell._slice(slice(0,None,1))
+    approach_orig =  example_split.approach._slice(slice(0,None,1))
     funcs = [ _predict_functor(example_split,f) for f in f_refs]
     final_dict = dict(remasking_functions=funcs,
                       threshold=threshold,**kwargs)
     pred_info = _predict_helper(example_split,**final_dict)
+    # restore anything the filters changed.
+    example_split.retract = retract_orig
+    example_split.dwell = dwell_orig
+    example_split.approach = approach_orig
     return pred_info
 
 def _predict_full(example,threshold=1e-2,f_refs=None,tau_fraction=0.02,
