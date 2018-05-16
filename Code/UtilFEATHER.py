@@ -51,10 +51,11 @@ def _split_from_retract(d,pct_approach,tau_f,**kw):
     tau_n_points = int(np.ceil(n * tau_f))
     # slice the data for the approach, as described above
     n_approach_start = n - (n_approach + 1)
+    retract = d._slice(slice(0,None,1))
     fake_approach = d._slice(slice(n_approach_start, n, 1))
     fake_dwell = d._slice(slice(n_approach_start - 1, n_approach_start, 1))
     split_fec = _manual_split(approach=fake_approach, dwell=fake_dwell,
-                              retract=d,tau_n_points=tau_n_points,
+                              retract=retract,tau_n_points=tau_n_points,
                               **kw)
     return split_fec
 
