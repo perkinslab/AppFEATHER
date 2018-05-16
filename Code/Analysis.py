@@ -586,6 +586,7 @@ def split_FEC_by_meta(time_sep_force_obj):
     approach = slice_func(slice(0             ,start_of_dwell,1))
     dwell    = slice_func(slice(start_of_dwell,end_of_dwell  ,1))
     retract  = slice_func(slice(end_of_dwell  ,None          ,1))
+    retract.Events = time_sep_force_obj.Events
     """
     plt.plot(approach.Time,approach.Force)
     plt.plot(dwell.Time,dwell.Force)
