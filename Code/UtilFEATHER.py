@@ -33,7 +33,8 @@ def _manual_split(approach,dwell,retract,tau_n_points,
     if short_circuit_adhesion:
         N = tau_n_points
         split_fec.get_predicted_retract_surface_index = lambda: N
-        split_fec.get_predicted_approach_surface_index = lambda : N
+        split_fec.get_predicted_approach_surface_index = \
+            lambda : approach.Force.size
     return split_fec
 
 def _split_from_retract(d,pct_approach,tau_f,**kw):
