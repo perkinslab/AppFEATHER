@@ -31,7 +31,7 @@ class simple_fec:
                           dwell_time=self.DwellTime,
                           events=self.Events)
 
-class split_force_extension:
+class split_force_extension(object):
     """
     class representing a force-extension curve, split into approach, dwell,
     and retract
