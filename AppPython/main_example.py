@@ -8,7 +8,7 @@ from __future__ import unicode_literals
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
-sys.path.append("../../")
+sys.path.append("../")
 
 from Code import _command_line_config,Detector
 
@@ -24,7 +24,7 @@ def run():
     """
     # there are a couple of ways to call FEATHER in python. 
     # # (1) through an intermediate '.csv' file
-    in_file = '../../Data/example.csv'
+    in_file = '../Data/example.csv'
     data = np.loadtxt(in_file,delimiter=',',skiprows=0)
     time,sep,force = data[:,0],data[:,1],data[:,2]
     threshold = 1e-3

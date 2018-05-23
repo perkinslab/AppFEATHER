@@ -29,14 +29,7 @@ function [indices] = feather(fec_obj,opt)
     end
     % make the initial command and just run the file by itself..
     command = [python_binary ' ' input_file];
-    % check that FEATHER can run
     [status,~] = system(command);
-    if (status ~= 0)
-        msg = ['FEATHER could not run; please ensure all the libaries ' ...
-                'are installed'];
-       assert(false,msg)
-    end
-    % POST: feather can run, so can python. go ahead and run 'for real'
     command = append_numeric(command,...
                              '-spring_constant',fec_obj.spring_constant);
     command = append_numeric(command,...
