@@ -5,5 +5,15 @@ function [] = feather_assertions()
             if it can't be found. 
     %}
     err_msg = ['FEATHER untested on MATLAB < 2017. Detected: ' version];
-    assert(~verLessThan('matlab','2017'),err_msg);
+    assert(~verLessThan('matlab','9'),err_msg);
+    assert_m_file_exists('feather.m')
+    assert_m_file_exists('feather_binary.m')
+    assert_m_file_exists('feather_options.m')
+    assert_m_file_exists('feather_path.m')
+    assert_m_file_exists('fec.m')
+end
+
+function [] = assert_m_file_exists(f)
+    msg = ['Could not load ' f ']'];
+    assert(exist(f, 'file') == 2,msg)
 end

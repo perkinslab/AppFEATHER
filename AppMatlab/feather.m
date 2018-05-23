@@ -21,12 +21,22 @@ function [indices] = feather(fec_obj,opt)
     save(matlab_file,'-struct','struct_to_save','-v7.3');
     python_binary = opt.python_binary;
     [status,~] = system([python_binary ' --version']);
+    % check that the binary exists
     if (status ~= 0)
        msg = ['Could not find python binary at ' python_binary '.'];
        msg = [msg ' Please check the python location.'];
        error(msg);
     end
+    % make the initial command and just run the file by itself..
     command = [python_binary ' ' input_file];
+    % check that FEATHER can run
+    [status,~] = system(command);
+    if (status ~= 0)
+        msg = ['FEATHER could not run; please ensure all the libaries ' ...
+                'are installed'];
+       assert(false,msg)
+    end
+    % POST: feather can run, so can python. go ahead and run 'for real'
     command = append_numeric(command,...
                              '-spring_constant',fec_obj.spring_constant);
     command = append_numeric(command,...
@@ -41,7 +51,7 @@ function [indices] = feather(fec_obj,opt)
                               '-file_input',matlab_file);                          
     command = append_argument(command,...
                               '-file_output',output_file);                             
-    [~,output] = system(command);
+    [~,~] = system(command);
     % read, skipping the first two rows 
     indices = csvread(output_file,2,0);
     % clean up the intermediates
