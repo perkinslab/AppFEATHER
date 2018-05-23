@@ -4,6 +4,7 @@ function []=feather_example()
 
     Path must be set properly 
     %}
+    feather_assertions();
     pwd_res = pwd;
     base_feather_dir = feather_path(pwd_res);
     % read the input file
