@@ -4,14 +4,11 @@ function []=feather_example()
 
     Path must be set properly 
     %}
-    delim = '/';
     pwd_res = pwd;
-    dir_str = strsplit(pwd_res,{delim,'\'},'CollapseDelimiters',true);
-    base = join(dir_str(1,1:end-1),delim);
-	% base_path should be correct if base is 
-    base_path = [base{1},'/AppPython/'];
+    base_feather_dir = feather_path(pwd_res);
     % read the input file
-    input_csv = '../Data/example.csv';
+    input_csv = [base_feather_dir filesep 'Data' filesep 'example.csv'];
+    base_path = [base_feather_dir filesep 'AppPython' filesep];
     data = csvread(input_csv);
     % get the individual columns, for plotting purposes
     time = data(:,1);
@@ -27,11 +24,7 @@ function []=feather_example()
     % get the feather-specific options to use
     threshold = 1e-3;
     tau = 2e-2;
-    if (ismac)
-        python_binary = '//anaconda/bin/python2 ';
-    else
-        python_binary = 'C:/ProgramData/Anaconda2/python.exe ';        
-    end
+    python_binary = feather_binary();
     opt = feather_options(threshold,tau,base_path,python_binary);
     % get the predicted event locations
     indices = feather(obj,opt); 
