@@ -14,7 +14,7 @@ def run():
           author='Patrick Heenan',
           author_email='patrick.heenan@colorado.edu',
           license='MIT',
-          packages=['.'],
+		  packages=["."],
           install_requires=[
               'scipy',
               'numpy',

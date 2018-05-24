@@ -12,17 +12,26 @@ dateStr=`date +%Y-%m-%d:%H:%M:%S`
 # Description:
 
 # Arguments:
-#### Arg 1: Description
+#### is_windows: boolean flag for if this is windows-like
+is_windows="$1"
 
 # test matlab
 cd ../AppMatlab/
-matlab_binary="/Applications/MATLAB_R2017a.app/bin/matlab"
-"${matlab_binary}" -nodesktop  -nosplash -r "run('feather_example.m'); exit;"
+if [[ $is_windows -eq "0" ]] ; then
+	matlab_binary="/Applications/MATLAB_R2017a.app/bin/matlab"
+else
+	matlab_binary="matlab"
+fi 
+"${matlab_binary}" -nodesktop  -nosplash -r "run('feather_example.m'); pause(2); exit;"
 cd - > /dev/null
 # test python
 cd ../AppPython/
-python2 main_example.py || ( echo "Runing python2 failed" ; exit );
-python3 main_example.py || ( echo "Runing python3 failed" ; exit );
+if [[ $is_windows -eq "0" ]] ; then
+	python2 main_example.py || ( echo "Runing python2 failed" ; exit );
+	python3 main_example.py || ( echo "Runing python3 failed" ; exit );
+else
+	python main_example.py || ( echo "Runing python2 failed" ; exit );
+fi
 cd - > /dev/null
 
 
