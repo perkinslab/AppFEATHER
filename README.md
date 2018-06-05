@@ -72,7 +72,7 @@ Each language (Matlab, Python, and Igor Pro) has an example file which shows FEA
 	- Run 'ModMainFeather#Main_Windows()' in the command window after compiling
 - Python:
 	- Run 'main_example.py' from the AppPython folder
-	- e.g. For windows type 'C:/ProgramData/Anaconda2/python.exe main_unit_feather.py' without quotes for Windows in git bash
+	- e.g. For windows type 'C:/ProgramData/Anaconda2/python.exe main_example.py' without quotes for Windows in git bash
 	
 **You should run the python files first**. Here is an example of run FEATHER in python on a Windows machine:
 
@@ -91,7 +91,7 @@ You can also run FEATHER directly from the command line, as described above. FEA
 - Files ending with '.pxp' with names formatted as below. 
     - These are Igor Pro files, and should have a separation, force, and time wave, named like:
 	    - "<X><#>Sep", "<X><#>Force", and "<X><#><Time" (without quotes)
-		- where <X> is any letters, and <#> is any digits.
+		- where "<X>" is any letters, and "<#>" is any digits.
     - For example, "Image0994Time", "Image0994Sep","Image0994Force".
 - Files ending with '.mat', formatted like '-v7.3' (see: mathworks.com/help/matlab/ref/save.html#bvmz_n7), with 'time', 'sep', and 'force' data sets. This is essentially an hdf5 file.
 - Files ending with '.csv', where there are three comma-delimited columns of length N, which are the time, separation, and force columns. 
