@@ -88,6 +88,7 @@ Running each of the files should result in a plot like the following appearing, 
 - The most common error for Igor and Matlab is an inaccurate Python binary location. 
 	-- In the relevant example file, check that the path matches the true path of python
 	-- Try 'which python' in Git bash or 'where python' in Terminal
+- Be sure that the python example file runs before trying Matlab or Igor Pro. If some part of the python install was bad, then nothing will work.
 
 
 
