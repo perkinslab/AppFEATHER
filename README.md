@@ -8,6 +8,10 @@ If you use FEATHER, please use the following citation:
 
 xxx
 
+# Video tutorial
+
+The steps in this text document are covered by [this video tutorial](https://www.google.com "FEATHER video tutorial")
+
 # Installing
 
 ## Getting the Repository
