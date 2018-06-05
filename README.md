@@ -33,7 +33,7 @@ Again, install python2.7 (*not* python3.4). For Matlab and Igor usage, FEATHER a
 
 This is the default for OS X, and also the default for Windows if you choose 'Install for all users', as in this picture:
 
-![Installing Anaconda2 for Windows to correct folder][Data/docs/WindowsInstall.png "Anaconda2 Windows install"]
+![Installing Anaconda2 for Windows to correct folder](Data/docs/WindowsInstall.png "Anaconda2 Windows install")
 
 As of 2018-3-26, the above paths are the default option for when Anaconda installs. If you install to a different location and use Matlab or Igor, you will need to update the relevant path in the ".m" or ".ipf" (see below).
 
@@ -82,6 +82,19 @@ Running each of the files should result in a plot like the following appearing, 
 
 ![FEATHER example output graph](Data/docs/example.png "FEATHER example output graph")
 	
+## Running FEATHER on your own data
+
+It is recommended to run FEATHER through one of the interfaces (python, Matlab, or Igor Pro). These interfaces deal with data management for you. Each example file (Matlab, Python, and Igor Pro, listed above), loads either a pxp or a csv file before calling FEATHER. To run on your data, modify the example to run on your file.
+
+You can also run FEATHER directly from the command line, as described above. FEATHER accepts the following formats:
+
+- Files ending with '.pxp' with names formatted as below. 
+    - These are Igor Pro files, and should have a separation, force, and time wave, named like "<X><#>Sep", "<X><#>Force", and "<X><#><Time" (without quotes), where <X> is any letters, and <#> is any digits.
+    - For example, "Image0994Time", "Image0994Sep","Image0994Force".
+- Files ending with '.mat', formatted like '-v7.3' (see: mathworks.com/help/matlab/ref/save.html#bvmz_n7), with 'time', 'sep', and 'force' data sets. This is essentially an hdf5 file.
+- Files ending with '.csv', where there are three comma-delimited columns of length N, which are the time, separation, and force columns. 
+
+All units are assumed SI (seconds, meters, and newtons)
 	
 ## Troubleshooting
 
