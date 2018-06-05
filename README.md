@@ -46,12 +46,12 @@ You will need the following libraries (installed by default by Anaconda)
 
 Whether you installed Anaconda or are using your own custom python, you should make sure all of the needed packages are installed by running the following commands in the install folder. Note that Windows must run this as an administrator (e.g., right click on git bash icon and click 'run as administrator').: 
 
--- "C:/ProgramData/Anaconda2/python.exe setup.py install" (for Windows, no quotes)
--- "//anaconda/bin/python2 setup.py install" (for MAC, no quotes)
+- "C:/ProgramData/Anaconda2/python.exe setup.py install" (for Windows, no quotes)
+- "//anaconda/bin/python2 setup.py install" (for MAC, no quotes)
 
 For example, in the image below, we have installed FEATHER in the home ('~') subdirectory), and we run setup.py. 
 
-![Making sure FEATHER will run][Data/docs/3_Setup_1_and_2.png "Ensuring FEATHER's dependencies exist"]
+![Making sure FEATHER will run](Data/docs/3_Setup_1_and_2.png "Ensuring FEATHER's dependencies exist")
 
 # Running the example
 
@@ -74,9 +74,9 @@ Each language (Matlab, Python, and Igor Pro) has an example file which shows FEA
 	- Run 'main_example.py' from the AppPython folder
 	- e.g. For windows type 'C:/ProgramData/Anaconda2/python.exe main_unit_feather.py' without quotes for Windows in git bash
 	
-You should run the python files first. Here is an example of run FEATHER in python on a Windows machine:
+**You should run the python files first**. Here is an example of run FEATHER in python on a Windows machine:
 
-![FEATHER running on windows in python][Data/docs/4_python_run_Setup_3.png "Running the python example"]
+![FEATHER running on windows in python](Data/docs/4_python_run_Setup_3.png "Running the python example")
 
 Running each of the files should result in a plot like the following appearing, with the predicted events marked:
 
