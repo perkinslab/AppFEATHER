@@ -30,7 +30,7 @@ if [[ $is_windows -eq "0" ]] ; then
 	python2 main_example.py || ( echo "Runing python2 failed" ; exit );
 	python3 main_example.py || ( echo "Runing python3 failed" ; exit );
 else
-	python main_example.py || ( echo "Runing python2 failed" ; exit );
+	/c/ProgramData/Anaconda2/python.exe main_example.py || ( echo "Runing python2 failed" ; exit );
 fi
 cd - > /dev/null
 
