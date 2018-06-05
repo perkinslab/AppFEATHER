@@ -89,7 +89,9 @@ It is recommended to run FEATHER through one of the interfaces (python, Matlab, 
 You can also run FEATHER directly from the command line, as described above. FEATHER accepts the following formats:
 
 - Files ending with '.pxp' with names formatted as below. 
-    - These are Igor Pro files, and should have a separation, force, and time wave, named like "<X><#>Sep", "<X><#>Force", and "<X><#><Time" (without quotes), where <X> is any letters, and <#> is any digits.
+    - These are Igor Pro files, and should have a separation, force, and time wave, named like:
+	    - "<X><#>Sep", "<X><#>Force", and "<X><#><Time" (without quotes)
+		- where <X> is any letters, and <#> is any digits.
     - For example, "Image0994Time", "Image0994Sep","Image0994Force".
 - Files ending with '.mat', formatted like '-v7.3' (see: mathworks.com/help/matlab/ref/save.html#bvmz_n7), with 'time', 'sep', and 'force' data sets. This is essentially an hdf5 file.
 - Files ending with '.csv', where there are three comma-delimited columns of length N, which are the time, separation, and force columns. 
