@@ -33,7 +33,7 @@ Again, install python2.7 (*not* python3.4). For Matlab and Igor usage, FEATHER a
 
 This is the default for OS X, and also the default for Windows if you choose 'Install for all users', as in this picture:
 
-![Installing Anaconda2 for Windows to correct folder](Data/docs/WindowsInstall.png "Anaconda2 Windows install")
+![Installing Anaconda2 for Windows to correct folder](Data/docs/2_WindowsInstall.png "Anaconda2 Windows install")
 
 As of 2018-3-26, the above paths are the default option for when Anaconda installs. If you install to a different location and use Matlab or Igor, you will need to update the relevant path in the ".m" or ".ipf" (see below).
 
