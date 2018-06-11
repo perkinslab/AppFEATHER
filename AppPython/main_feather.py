@@ -78,6 +78,7 @@ def run():
         # Log it or whatever here
         str_out =''.join('!! ' + line for line in lines)
         print(str_out)
+        exit(-1)
         
 if __name__ == "__main__":
     run()
