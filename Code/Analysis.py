@@ -235,7 +235,7 @@ class split_force_extension(object):
         dZ_surface = self.approach.Zsnsr[-1] - self.approach.Zsnsr[approach_idx]
         dZ_needed = abs(dZ_surface)
         # return the first time the retract is above the surface Z
-        dZ_retract = self.retract.ZSnsr - self.retract.ZSnsr[0]
+        dZ_retract = np.abs(self.retract.ZSnsr - self.retract.ZSnsr[0])
         where_retract_above_surface = np.where(dZ_retract >= dZ_needed)[0]
         assert where_retract_above_surface.size > 0 , \
             "Couldn't find surface in retract. Z_retract never reached surface."
