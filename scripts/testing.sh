@@ -13,7 +13,9 @@ dateStr=`date +%Y-%m-%d:%H:%M:%S`
 
 # Arguments:
 #### is_windows: boolean flag for if this is windows-like
-is_windows="$1"
+is_windows="${1:-1}"
+
+echo "Is Windows flag: ${is_windows}"
 
 # test matlab
 cd ../AppMatlab/
@@ -22,9 +24,11 @@ if [[ $is_windows -eq "0" ]] ; then
 else
 	matlab_binary="matlab"
 fi 
-"${matlab_binary}" -nodesktop  -nosplash -r "run('feather_example.m'); pause(2); exit;"
+echo "Booting Matlab..."
+"${matlab_binary}" -wait -nodesktop  -nosplash -r "run('feather_example.m'); pause(2); exit;"
 cd - > /dev/null
 # test python
+echo "Booting python..."
 cd ../AppPython/
 if [[ $is_windows -eq "0" ]] ; then
 	python2 main_example.py || ( echo "Runing python2 failed" ; exit );
