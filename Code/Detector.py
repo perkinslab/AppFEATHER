@@ -738,7 +738,8 @@ def _predict_full(example,threshold=1e-2,f_refs=None,tau_fraction=0.02,
     example_split = Analysis.\
         zero_and_split_force_extension_curve(example,
                                              fraction=tau_fraction)            
-    pred_info = _predict_split_fec(example_split,threshold,f_refs=f_refs,**kwargs)
+    pred_info = _predict_split_fec(example_split,threshold,f_refs=f_refs,
+                                   **kwargs)
     return example_split, pred_info
 
 def predict(example,threshold=1e-2,add_offsets=False,**kwargs):
