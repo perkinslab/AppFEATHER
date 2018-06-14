@@ -53,6 +53,7 @@ class no_event_parameters:
                  integral_epsilon=None,integral_sigma=None,
                  valid_delta=True,valid_derivative=True,valid_integral=True,
                  mask_is_conditional=True,negative_only=True,
+                 delta_abs_epsilon=None,delta_abs_sigma=None,
                  last_interpolator_used=None):
         self.epsilon = epsilon
         self.sigma = sigma
@@ -60,6 +61,9 @@ class no_event_parameters:
         # delta parameters
         self.delta_epsilon=delta_epsilon
         self.delta_sigma=delta_sigma
+        # abs delta parameters
+        self.delta_abs_epsilon = delta_abs_epsilon
+        self.delta_abs_sigma = delta_abs_sigma
         # derivative parameters
         self.derivative_epsilon=derivative_epsilon
         self.derivative_sigma=derivative_sigma

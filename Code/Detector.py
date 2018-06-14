@@ -244,8 +244,8 @@ def delta_mask_function(split_fec,slice_to_use,
     dt = np.median(np.diff(x_sliced))
     deriv_cond = np.zeros(boolean_ret.size,dtype=np.bool)
     consistent_with_zero_cond = np.zeros(boolean_ret.size,dtype=np.bool)
-    sigma_df = no_event_parameters_object.delta_sigma
-    epsilon_df = no_event_parameters_object.delta_epsilon
+    sigma_df = no_event_parameters_object.delta_abs_sigma
+    epsilon_df = no_event_parameters_object.delta_abs_epsilon
     deriv_cond[slice_to_use] = \
             interp_f + (deriv * min_points_between/2 * dt) < sigma_df
     # XXX debugging...
@@ -611,6 +611,9 @@ def make_event_parameters_from_split_fec(split_fec,**kwargs):
                                    interpolator_approach_f,
                                    min_points_between)
     delta_epsilon,delta_sigma = np.median(df_approach),np.std(df_approach)
+    abs_df_approach = np.abs(df_approach)
+    delta_abs_epsilon, delta_abs_sigma = np.median(abs_df_approach),\
+                                         np.std(abs_df_approach)
     """
     get the interpolated integral in the slice
     """
@@ -640,7 +643,9 @@ def make_event_parameters_from_split_fec(split_fec,**kwargs):
                          delta_sigma   = delta_sigma,
                          derivative_epsilon = derivative_epsilon,
                          derivative_sigma   = derivative_sigma,
-                         epsilon=epsilon,sigma=sigma,**kwargs)
+                         epsilon=epsilon,sigma=sigma,
+                         delta_abs_epsilon=delta_abs_epsilon,
+                         delta_abs_sigma=delta_abs_sigma,**kwargs)
     return approach_dict                           
 	
                          
