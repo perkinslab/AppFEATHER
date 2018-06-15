@@ -194,16 +194,32 @@ def delta_mask_function(split_fec,slice_to_use,
     interpolator = no_event_parameters_object.last_interpolator_used
     interp_f = interpolator(x_sliced)
     # offset to right now (assume this is after surface  touchoff /adhesions)
-    offset_idx = 0
-    offset_zero_force = interp_f[offset_idx]
     where_event = np.where(boolean_array)[0]
     n = force.size
     # offset to zero if it makes sense
-    if (where_event.size > 0 and (where_event[-1] < n-min_points_between)):
-        offset_idx = where_event[-1]
-    else:
-        offset_idx = n-min_points_between
-    offset_zero_force = np.median(force[offset_idx:])
+    event_mask = np.where(boolean_array[slice_to_use])[0]
+    offset_idx = 0
+    offset_zero_force = interp_f[0]
+    if (event_mask.size > 0):
+        slices = _event_slices_from_mask(event_mask, min_points_between)
+        event_lengths = [s.stop - s.start for s in slices]
+        # find the last 'long' event not at the end
+        long_event_ends = [s.stop for i, s in enumerate(slices) if
+                           event_lengths[i] > min_points_between
+                           and s.stop < force_sliced.size - min_points_between]
+        if (len(long_event_ends) > 0):
+            last_long_event = long_event_ends[-1]
+            offset_idx = last_long_event
+            offset_zero_force = np.median(force_sliced[offset_idx:])
+    """
+    plt.close()
+    plt.plot(x_sliced,force_sliced)
+    plt.axhline(offset_zero_force)
+    plt.axvline(x_sliced[offset_idx])
+    for e in slices:
+        plt.plot(x_sliced[e],force_sliced[e],'r')
+    plt.show()
+    """
     split_fec.zero_retract_force(offset_zero_force)
     interp_f -= offset_zero_force
     df_true = _no_event._delta(x_sliced,interp_f,min_points_between)
@@ -316,15 +332,23 @@ def delta_mask_function(split_fec,slice_to_use,
             _condition_delta_at_zero(no_event_parameters_object,force_sliced,
                                      n_points)
     condition_non_events = (consistent_with_zero_cond | deriv_cond)
+    boolean_ret, probability_updated = \
+        consistent_with_zero(boolean_ret,probability_updated,
+                             condition_non_events,min_points_between,
+                             get_best_slice_func,threshold)
+    return slice_to_use,boolean_ret,probability_updated
+
+def consistent_with_zero(boolean_ret,probability_updated,condition_non_events,
+                         min_points_between,get_best_slice_func,threshold):
     boolean_ret,probability_updated = \
             safe_reslice(original_boolean=boolean_ret,
                          original_probability=probability_updated,
                          condition=condition_non_events,
-                         min_points_between=min_points_between,    
+                         min_points_between=min_points_between,
                          get_best_slice_func=get_best_slice_func)
     probability_updated[-min_points_between:] = 1
     boolean_ret = probability_updated < threshold
-    return slice_to_use,boolean_ret,probability_updated
+    return boolean_ret,probability_updated
 
 def get_events_before_marker(marker_idx,event_mask,min_points_between):
     if (event_mask.size == 0):
