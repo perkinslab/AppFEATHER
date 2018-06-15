@@ -433,11 +433,24 @@ def _predict(x,y,n_points,interp,threshold,local_event_idx_function,
     event_slices = [slice(event.start-remainder,event.stop+remainder,1)
                     for event,remainder in zip(event_slices,remainder_split)]
     max_idx = x.size-1
-    event_idx = [min(max_idx,local_event_idx_function(x,y,e))
-                 for e in event_slices]
     # make sure all the indices are in range.
     event_slices = [slice(max(0,e.start),min(e.stop,max_idx+1))
                      for e in event_slices]
+    # dont look at any events at the end
+    event_slices = [e for e in event_slices
+                    if e.stop < max_idx - min_points_between]
+    event_idx = [min(max_idx,local_event_idx_function(x,y,e))
+                 for e in event_slices]
+    # update the probability distribution
+    events_final_bool = np.zeros(probability_distribution.size,dtype=np.bool)
+    for e in event_slices:
+        events_final_bool[e] = 1
+    where_events_final = np.where(events_final_bool)[0]
+    where_non_events = np.where(np.invert(events_final_bool))[0]
+    probability_distribution[where_non_events] = 1
+    probabilities[-1][where_non_events] = 1
+    masks[-1] = where_events_final
+    mask = where_events_final
     to_ret = prediction_info(event_idx = event_idx,
                              event_slices = event_slices,
                              local_stdev = stdevs,

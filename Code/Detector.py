@@ -322,6 +322,7 @@ def delta_mask_function(split_fec,slice_to_use,
                          condition=condition_non_events,
                          min_points_between=min_points_between,    
                          get_best_slice_func=get_best_slice_func)
+    probability_updated[-min_points_between:] = 1
     boolean_ret = probability_updated < threshold
     return slice_to_use,boolean_ret,probability_updated
 
