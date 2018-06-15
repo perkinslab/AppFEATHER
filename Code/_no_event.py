@@ -438,7 +438,8 @@ def _predict(x,y,n_points,interp,threshold,local_event_idx_function,
                      for e in event_slices]
     # dont look at any events at the end
     event_slices = [e for e in event_slices
-                    if e.stop < max_idx - min_points_between]
+                    if (e.stop < max_idx - min_points_between and
+                        e.start > slice_to_use.start + min_points_between)]
     event_idx = [min(max_idx,local_event_idx_function(x,y,e))
                  for e in event_slices]
     # update the probability distribution
