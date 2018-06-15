@@ -198,9 +198,12 @@ def delta_mask_function(split_fec,slice_to_use,
     offset_zero_force = interp_f[offset_idx]
     where_event = np.where(boolean_array)[0]
     n = force.size
+    # offset to zero if it makes sense
     if (where_event.size > 0 and (where_event[-1] < n-min_points_between)):
         offset_idx = where_event[-1]
-        offset_zero_force = np.median(force[offset_idx:])
+    else:
+        offset_idx = n-min_points_between
+    offset_zero_force = np.median(force[offset_idx:])
     split_fec.zero_retract_force(offset_zero_force)
     interp_f -= offset_zero_force
     df_true = _no_event._delta(x_sliced,interp_f,min_points_between)
@@ -231,13 +234,16 @@ def delta_mask_function(split_fec,slice_to_use,
                          get_best_slice_func=get_best_slice_func)
     boolean_ret = probability_updated < threshold
     """
-    plt.subplot(2,1,1)
-    plt.plot(x,force)
-    plt.plot(x_sliced,interp_f)
-    plt.subplot(2,1,2)
-    plt.plot(x_sliced,boolean_array[slice_to_use]+2.1)
-    plt.plot(x_sliced,value_cond+1.1)
-    plt.plot(x_sliced,no_event_cond)
+    xlim = min(x), max(x)
+    plt.subplot(2, 1, 1)
+    plt.plot(x, force)
+    plt.plot(x_sliced, interp_f)
+    plt.xlim(xlim)
+    plt.subplot(2, 1, 2)
+    plt.plot(x_sliced, boolean_array[slice_to_use] + 2.1)
+    plt.plot(x_sliced, value_cond + 1.1)
+    plt.plot(x_sliced, no_event_cond)
+    plt.xlim(xlim)
     plt.show()
     """
     deriv = _no_event._spline_derivative(x_sliced,interpolator)
