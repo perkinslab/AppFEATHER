@@ -205,12 +205,21 @@ def delta_mask_function(split_fec,slice_to_use,
         event_lengths = [s.stop - s.start for s in slices]
         # find the last 'long' event not at the end
         long_event_ends = [s.stop for i, s in enumerate(slices) if
-                           event_lengths[i] > min_points_between
-                           and s.stop < force_sliced.size - min_points_between]
+                           event_lengths[i] > n_points
+                           and s.stop < force_sliced.size - n_points]
         if (len(long_event_ends) > 0):
             last_long_event = long_event_ends[-1]
             offset_idx = last_long_event
             offset_zero_force = np.median(force_sliced[offset_idx:])
+        else:
+            # couldnt find a long enough event; just zero based on the end
+            if (where_event.size > 0 and
+                where_event[-1] < force_sliced.size - min_points_between):
+                offset_idx = where_event[-1]+1
+                offset_zero_force = np.median(force[offset_idx:])
+            else:
+                offset_idx = n - min_points_between
+                offset_zero_force = np.median(force[offset_idx:])
     """
     plt.close()
     plt.plot(x_sliced,force_sliced)
