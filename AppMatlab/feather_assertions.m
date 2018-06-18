@@ -12,8 +12,3 @@ function [] = feather_assertions()
     assert_m_file_exists('feather_path.m')
     assert_m_file_exists('fec.m')
 end
-
-function [] = assert_m_file_exists(f)
-    msg = ['Could not load ' f ']'];
-    assert(exist(f, 'file') == 2,msg)
-end

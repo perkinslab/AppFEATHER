@@ -8,17 +8,18 @@ function []=feather_example()
     pwd_res = pwd;
     base_feather_dir = feather_path(pwd_res);
     % read the input file
-    input_csv = [base_feather_dir filesep 'Data' filesep 'example.csv'];
+    input_csv = [base_feather_dir filesep 'Data' filesep  ...
+                 '3D300_3800_Image0909DeflConcat.csv'];
     base_path = [base_feather_dir filesep 'AppPython' filesep];
-    data = csvread(input_csv);
+    [trigger_time,dwell_time,spring_constant] = ...
+        feather_meta_header(input_csv);
+    skip_rows=2;
+    skip_cols=0;
+    data = csvread(input_csv,skip_rows,skip_cols);
     % get the individual columns, for plotting purposes
     time = data(:,1);
     separation = data(:,2);
     force = data(:,3);
-    % in this case, the instrument records  meta information we need 
-    trigger_time = 0.382;
-    dwell_time = 0.992;
-    spring_constant = 6.67e-3;
     % get the force extension curve object to use
     obj = fec(time,separation,force,trigger_time,dwell_time,...
               spring_constant);
