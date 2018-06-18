@@ -7,13 +7,60 @@ from __future__ import unicode_literals
 # This file is used for importing the common utilities classes.
 import numpy as np
 import matplotlib.pyplot as plt
-import sys
+import sys, re
 
 from UtilForce.FEC import FEC_Util
 from UtilGeneral import GenUtilities
 from UtilIgor import PxpLoader,TimeSepForceObj
 import h5py
 from Code import Detector
+
+
+
+class HeaderInfo(object):
+    def __init__(self,spring_constant,trigger_time,dwell_time):
+        self.spring_constant = spring_constant
+        self.trigger_time = trigger_time
+        self.dwell_time = dwell_time
+        
+
+def _parse_csv_header(in_file):
+    """
+    :param in_file: file to read in; first line should have part like
+    SpringConstant:<Number>,TriggerTime:<Number>,DwellTime:<Number>
+
+    Where <Number> is a valid float. E.g., SpringConstant:0.001,TriggerTime:
+
+    :return:  HeaderInfo object
+    """
+    values = []
+    keys=["SpringConstant","TriggerTime","DwellTime"]
+    with open(in_file,'r') as f:
+        header_l1 = f.readline()
+        assert (header_l1 is not None) and (len(header_l1) > 0)
+        for k in keys:
+            pattern=r"""
+                     [$,\s]           # start, space, or comma
+                     {:s}             # our literal string
+                     \s*:\s*          # literal colon, optional spaces
+                     ([^,\s]+)        # any non-commas or spaces (a #)
+                     """.format(k)
+            match = re.search(pattern,header_l1,re.VERBOSE)
+            assert match is not None
+            check = match.group(1)
+            try:
+                value = float(check)
+            except ValueError:
+                assert False, "Couldn't find {:s}. Value = {:s}".format(k,check)
+            # POST: correctly found the float
+            values.append(value)
+    assert len(values) == 3 , "Couldn't parse everything."
+    to_ret =  HeaderInfo(spring_constant=values[0],
+                         trigger_time=values[1],
+                         dwell_time=values[2])
+    return to_ret
+                      
+                      
 
 
 def read_matlab_file_into_fec(input_file):
