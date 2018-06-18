@@ -194,13 +194,41 @@ def delta_mask_function(split_fec,slice_to_use,
     interpolator = no_event_parameters_object.last_interpolator_used
     interp_f = interpolator(x_sliced)
     # offset to right now (assume this is after surface  touchoff /adhesions)
-    offset_idx = 0
-    offset_zero_force = interp_f[offset_idx]
     where_event = np.where(boolean_array)[0]
     n = force.size
-    if (where_event.size > 0 and (where_event[-1] < n-min_points_between)):
-        offset_idx = where_event[-1]
-        offset_zero_force = np.median(force[offset_idx:])
+    # offset to zero if it makes sense
+    event_mask = np.where(boolean_array[slice_to_use])[0]
+    offset_idx = 0
+    offset_zero_force = interp_f[0]
+    if (event_mask.size > 0):
+        slices = _event_slices_from_mask(event_mask, min_points_between)
+        event_lengths = [s.stop - s.start for s in slices]
+        # find the last 'long' event not at the end
+        long_event_ends = [s.stop for i, s in enumerate(slices) if
+                           event_lengths[i] > n_points
+                           and s.stop < force_sliced.size - n_points]
+        if (len(long_event_ends) > 0):
+            last_long_event = long_event_ends[-1]
+            offset_idx = last_long_event
+            offset_zero_force = np.median(force_sliced[offset_idx:])
+        else:
+            # couldnt find a long enough event; just zero based on the end
+            if (where_event.size > 0 and
+                where_event[-1] < force_sliced.size - min_points_between):
+                offset_idx = where_event[-1]+1
+                offset_zero_force = np.median(force[offset_idx:])
+            else:
+                offset_idx = n - min_points_between
+                offset_zero_force = np.median(force[offset_idx:])
+    """
+    plt.close()
+    plt.plot(x_sliced,force_sliced)
+    plt.axhline(offset_zero_force)
+    plt.axvline(x_sliced[offset_idx])
+    for e in slices:
+        plt.plot(x_sliced[e],force_sliced[e],'r')
+    plt.show()
+    """
     split_fec.zero_retract_force(offset_zero_force)
     interp_f -= offset_zero_force
     df_true = _no_event._delta(x_sliced,interp_f,min_points_between)
@@ -231,21 +259,24 @@ def delta_mask_function(split_fec,slice_to_use,
                          get_best_slice_func=get_best_slice_func)
     boolean_ret = probability_updated < threshold
     """
-    plt.subplot(2,1,1)
-    plt.plot(x,force)
-    plt.plot(x_sliced,interp_f)
-    plt.subplot(2,1,2)
-    plt.plot(x_sliced,boolean_array[slice_to_use]+2.1)
-    plt.plot(x_sliced,value_cond+1.1)
-    plt.plot(x_sliced,no_event_cond)
+    xlim = min(x), max(x)
+    plt.subplot(2, 1, 1)
+    plt.plot(x, force)
+    plt.plot(x_sliced, interp_f)
+    plt.xlim(xlim)
+    plt.subplot(2, 1, 2)
+    plt.plot(x_sliced, boolean_array[slice_to_use] + 2.1)
+    plt.plot(x_sliced, value_cond + 1.1)
+    plt.plot(x_sliced, no_event_cond)
+    plt.xlim(xlim)
     plt.show()
     """
     deriv = _no_event._spline_derivative(x_sliced,interpolator)
     dt = np.median(np.diff(x_sliced))
     deriv_cond = np.zeros(boolean_ret.size,dtype=np.bool)
     consistent_with_zero_cond = np.zeros(boolean_ret.size,dtype=np.bool)
-    sigma_df = no_event_parameters_object.delta_sigma
-    epsilon_df = no_event_parameters_object.delta_epsilon
+    sigma_df = no_event_parameters_object.delta_abs_sigma
+    epsilon_df = no_event_parameters_object.delta_abs_epsilon
     deriv_cond[slice_to_use] = \
             interp_f + (deriv * min_points_between/2 * dt) < sigma_df
     # XXX debugging...
@@ -310,14 +341,23 @@ def delta_mask_function(split_fec,slice_to_use,
             _condition_delta_at_zero(no_event_parameters_object,force_sliced,
                                      n_points)
     condition_non_events = (consistent_with_zero_cond | deriv_cond)
+    boolean_ret, probability_updated = \
+        consistent_with_zero(boolean_ret,probability_updated,
+                             condition_non_events,min_points_between,
+                             get_best_slice_func,threshold)
+    return slice_to_use,boolean_ret,probability_updated
+
+def consistent_with_zero(boolean_ret,probability_updated,condition_non_events,
+                         min_points_between,get_best_slice_func,threshold):
     boolean_ret,probability_updated = \
             safe_reslice(original_boolean=boolean_ret,
                          original_probability=probability_updated,
                          condition=condition_non_events,
-                         min_points_between=min_points_between,    
+                         min_points_between=min_points_between,
                          get_best_slice_func=get_best_slice_func)
+    probability_updated[-min_points_between:] = 1
     boolean_ret = probability_updated < threshold
-    return slice_to_use,boolean_ret,probability_updated
+    return boolean_ret,probability_updated
 
 def get_events_before_marker(marker_idx,event_mask,min_points_between):
     if (event_mask.size == 0):
@@ -611,6 +651,9 @@ def make_event_parameters_from_split_fec(split_fec,**kwargs):
                                    interpolator_approach_f,
                                    min_points_between)
     delta_epsilon,delta_sigma = np.median(df_approach),np.std(df_approach)
+    abs_df_approach = np.abs(df_approach)
+    delta_abs_epsilon, delta_abs_sigma = np.median(abs_df_approach),\
+                                         np.std(abs_df_approach)
     """
     get the interpolated integral in the slice
     """
@@ -640,7 +683,9 @@ def make_event_parameters_from_split_fec(split_fec,**kwargs):
                          delta_sigma   = delta_sigma,
                          derivative_epsilon = derivative_epsilon,
                          derivative_sigma   = derivative_sigma,
-                         epsilon=epsilon,sigma=sigma,**kwargs)
+                         epsilon=epsilon,sigma=sigma,
+                         delta_abs_epsilon=delta_abs_epsilon,
+                         delta_abs_sigma=delta_abs_sigma,**kwargs)
     return approach_dict                           
 	
                          
@@ -738,7 +783,8 @@ def _predict_full(example,threshold=1e-2,f_refs=None,tau_fraction=0.02,
     example_split = Analysis.\
         zero_and_split_force_extension_curve(example,
                                              fraction=tau_fraction)            
-    pred_info = _predict_split_fec(example_split,threshold,f_refs=f_refs,**kwargs)
+    pred_info = _predict_split_fec(example_split,threshold,f_refs=f_refs,
+                                   **kwargs)
     return example_split, pred_info
 
 def predict(example,threshold=1e-2,add_offsets=False,**kwargs):
