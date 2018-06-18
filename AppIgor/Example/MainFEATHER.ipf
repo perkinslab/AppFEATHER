@@ -53,6 +53,7 @@ Static Function Main([base,input_file])
 	Variable valid = n_waves_loaded > 0
 	ModErrorUtil#Assert(valid,msg="Didn't load waves")
 	String tmp = ModIoUtil#GetWaveAtIndex(loc_tmp,0,fullPath=1)
+	String note_v = note($tmp)
 	opt.trigger_time = ModOfflineAsylum#note_variable(note_v,"TriggerTime",delim_pairs=",")
 	opt.dwell_time = ModOfflineAsylum#note_variable(note_v,"DwellTime",delim_pairs=",")
 	opt.spring_constant = ModOfflineAsylum#note_variable(note_v,"SpringConstant",delim_pairs=",")
@@ -68,13 +69,14 @@ Static Function Main([base,input_file])
 	// Make a fun plot wooo
 	LoadData /O/Q/R (ModOperatingSystemUtil#sanitize_path(input_file))
 	Wave Y =  $("Image0994Force")
+	y[] *= -1
 	Wave X =  $("Image0994Sep")
-	Display Y vs X
+	Display Y
 	Variable n_events = DimSize(output.event_starts,0)
 	Variable i
 	for (i=0; i<n_events; i+=1)
 		Variable event_idx = output.event_starts[i]
-		ModPlotUtil#axvline(X[event_idx])
+		ModPlotUtil#axvline(event_idx)
 	endfor
 	ModPlotUtil#xlabel("Extension (m)")
 	ModPlotUtil#ylabel("Force (N)")
