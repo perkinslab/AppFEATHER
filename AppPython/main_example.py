@@ -26,7 +26,7 @@ def run():
     """
     # there are a couple of ways to call FEATHER in python. 
     # # (1) through an intermediate '.csv' file
-    in_file = '../Data/example.csv'
+    in_file = '../Data/example_0.csv'
     data = np.loadtxt(in_file,delimiter=',',skiprows=0)
     header_info = _command_line_config._parse_csv_header(in_file)
     time,sep,force = data[:,0],data[:,1],data[:,2]

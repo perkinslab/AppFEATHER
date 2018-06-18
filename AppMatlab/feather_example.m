@@ -9,7 +9,7 @@ function []=feather_example()
     base_feather_dir = feather_path(pwd_res);
     % read the input file
     input_csv = [base_feather_dir filesep 'Data' filesep  ...
-                 'example.csv'];
+                 'example_0.csv'];
     base_path = [base_feather_dir filesep 'AppPython' filesep];
     [trigger_time,dwell_time,spring_constant] = ...
         feather_meta_header(input_csv);
@@ -25,7 +25,7 @@ function []=feather_example()
               spring_constant);
     % get the feather-specific options to use
     threshold = 1e-3;
-    tau = 1.5e-2;
+    tau = 2e-2;
     python_binary = feather_binary();
     opt = feather_options(threshold,tau,base_path,python_binary);
     % get the predicted event locations
