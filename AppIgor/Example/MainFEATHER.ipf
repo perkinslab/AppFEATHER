@@ -5,6 +5,8 @@
 #include ":::UtilIgorPro:Util:PlotUtil"
 #include ":::UtilIgorPro:Util:IoUtil"
 #include ":::UtilIgorPro:Util:OperatingSystemUtil"
+#include ":::UtilIgorPro:Cypher:OfflineAsylum"
+
 
 
 #pragma ModuleName = ModMainFeather
@@ -43,10 +45,28 @@ Static Function Main([base,input_file])
 	opt.tau = 0
 	opt.threshold = 1e-3
 	opt.tau = 1.5e-2
+	// Load the wave
+	String loc_tmp = "root:tmp"
+	ModIoUtil#LoadFile(input_file,locToLoadInto=loc_tmp)
 	// Add the meta information
-	opt.trigger_time = 0.382
-	opt.dwell_time = 0.992
-	opt.spring_constant = 6.67e-3
+	Variable n_waves_loaded =ModIoUtil#CountWaves(loc_tmp)  
+	Variable valid = n_waves_loaded > 0
+	ModErrorUtil#Assert(valid,msg="Didn't load waves")
+	String tmp = ModIoUtil#GetWaveAtIndex(loc_tmp,0,fullPath=1)
+	String note_v = note($tmp)
+	// XXX fix the variables
+	Variable j
+	for (j=0; j< n_waves_loaded; j+=1)
+		 tmp = ModIoUtil#GetWaveAtIndex(loc_tmp,j,fullPath=1)
+		note_v = note($tmp)
+		ModOfflineAsylum#replace_note_string(note_v,"TriggerTime","0.382")
+		ModOfflineAsylum#replace_note_string(note_v,"DwellTime"," 0.992")
+		ModOfflineAsylum#replace_note_string(note_v,"SpringConstant"," 6.67e-3")
+		Note /K $tmp, note_v
+	endfor
+	opt.trigger_time = ModOfflineAsylum#note_variable(note_v,"TriggerTime")
+	opt.dwell_time = ModOfflineAsylum#note_variable(note_v,"DwellTime")
+	opt.spring_constant = ModOfflineAsylum#note_variable(note_v,"SpringConstant")
 	// add the file information
 	opt.meta.path_to_input_file = input_file
 	opt.meta.path_to_research_directory = base
