@@ -52,7 +52,9 @@ def run():
     # POST: they are consistent. go ahead and plot force vs time, add lines
     # where an event is predicted
     print("Found events at indices: {}".format(event_indices_1))
-    plt.plot(time,force*(-1e12))
+    force_pN = force*-1e12
+    force_pN_zero = force_pN - force_pN[force_pN.size//10]
+    plt.plot(time,force_pN_zero)
     for i in event_indices_1:
         plt.axvline(time[i])
     plt.xlabel("Time (s)")

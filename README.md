@@ -1,6 +1,10 @@
 # Description
 
+![FEATHER cloning](Data/docs/abtsract.png "Cloning FEATHER")
+
 This repository contains FEATHER (*F*orce *E*xtension *A*nalysis using a *T*estable *H*ypothesis for *E*vent *R*ecognition), a freely available technique for finding rupture events in force spectroscopy data.
+
+
 
 # Citing FEATHER
 
@@ -84,7 +88,7 @@ Each language (Matlab, Python, and Igor Pro) has an example file which shows FEA
 
 Running each of the files should result in a plot like the following appearing, with the predicted events marked:
 
-![FEATHER example output graph](Data/docs/example.png "FEATHER example output graph")
+![FEATHER example output graph](Data/docs/example_zoom.png "FEATHER example output graph")
 	
 ## Running FEATHER on your own data
 
@@ -94,14 +98,14 @@ You can also run FEATHER directly from the command line, as described above. FEA
 
 - Files ending with '.pxp' with names formatted as below. 
     - These are Igor Pro files, and should have a separation, force, and time wave, named like:
-	    - "<X><#>Sep", "<X><#>Force", and "<X><#><Time" (without quotes)
-		- where "<X>" is any letters, and "<#>" is any digits.
+	    - "[X][#]Sep", "[X][#]Force", and "[X][#]Time" (without quotes)
+		- where "[X]" is any letters, and "[#]" is any digits.
     - For example, "Image0994Time", "Image0994Sep","Image0994Force".
     - If directly using the example .ipf file, the note must have a string like:
-        - "TriggerTime:<number>,DwellTime:<number>,SpringConstant<numbers>", where <number> is a value in SI units and the values are repsectively the end of the approach, the length of the dwell at the surface before retraction, and the spring constnat of the force probe.
+        - "TriggerTime:[number],DwellTime:[number],SpringConstant[numbers]" without quotes, where [number] is a value in SI units (*e.g.* 0.123e-6, without brackets) and the values are repsectively the end of the approach, the length of the dwell at the surface before retraction, and the spring constnat of the force probe.
 - Files ending with '.mat', formatted like '-v7.3' (see: mathworks.com/help/matlab/ref/save.html#bvmz_n7), with 'time', 'sep', and 'force' data sets. This is essentially an hdf5 file.
 - Files ending with '.csv', where there are three comma-delimited columns of length N, which are the time, separation, and force columns.
-  - If directly using the python or matlab example file, the first line should have a string formatted just as the Igor note above (*i.e.*, "TriggerTime:<number>,DwellTime:<number>,SpringConstant<numbers>")
+  - If directly using the python or matlab example file, the first line should have a string formatted just as the Igor note described above.
 
 All units are assumed SI (seconds, meters, and newtons)
 	
