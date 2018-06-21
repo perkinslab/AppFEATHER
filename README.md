@@ -1,6 +1,6 @@
 # Description
 
-![FEATHER cloning](Data/docs/abtsract.png "Cloning FEATHER")
+![FEATHER cloning](Data/docs/abstract.png "Cloning FEATHER")
 
 This repository contains FEATHER (*F*orce *E*xtension *A*nalysis using a *T*estable *H*ypothesis for *E*vent *R*ecognition), a freely available technique for finding rupture events in force spectroscopy data.
 
