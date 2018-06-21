@@ -89,6 +89,10 @@ Each language (Matlab, Python, and Igor Pro) has an example file which shows FEA
 Running each of the files should result in a plot like the following appearing, with the predicted events marked:
 
 ![FEATHER example output graph](Data/docs/example_zoom.png "FEATHER example output graph")
+
+# Running more examples
+
+FEATHER has many more example force-extension curves in the Data subdirectory. If you would lie to run them in Matlab or python, merely change the input file variable from (the default) 'example_0.csv' to whichever file you want to run. In Igor, export one of those .csv files to a .pxp file , as described below. 
 	
 ## Running FEATHER on your own data
 
