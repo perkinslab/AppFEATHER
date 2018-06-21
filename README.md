@@ -39,7 +39,7 @@ This is the default for OS X, and also the default for Windows if you choose 'In
 
 ![Installing Anaconda2 for Windows to correct folder](Data/docs/2_WindowsInstall.png "Anaconda2 Windows install")
 
-As of 2018-3-26, the above paths are the default option for when Anaconda installs. If you install to a different location and use Matlab or Igor, you will need to update the relevant path in the ".m" or ".ipf" (see below).
+As of 2018-6, the above paths are the default option for when Anaconda installs. If you install to a different location and use Matlab or Igor, you will need to update the relevant path in the ".m" or ".ipf" (see below).
 
 You will need the following libraries (installed by default by Anaconda)
 
@@ -97,8 +97,11 @@ You can also run FEATHER directly from the command line, as described above. FEA
 	    - "<X><#>Sep", "<X><#>Force", and "<X><#><Time" (without quotes)
 		- where "<X>" is any letters, and "<#>" is any digits.
     - For example, "Image0994Time", "Image0994Sep","Image0994Force".
+    - If directly using the example .ipf file, the note must have a string like:
+        - "TriggerTime:<number>,DwellTime:<number>,SpringConstant<numbers>", where <number> is a value in SI units and the values are repsectively the end of the approach, the length of the dwell at the surface before retraction, and the spring constnat of the force probe.
 - Files ending with '.mat', formatted like '-v7.3' (see: mathworks.com/help/matlab/ref/save.html#bvmz_n7), with 'time', 'sep', and 'force' data sets. This is essentially an hdf5 file.
-- Files ending with '.csv', where there are three comma-delimited columns of length N, which are the time, separation, and force columns. 
+- Files ending with '.csv', where there are three comma-delimited columns of length N, which are the time, separation, and force columns.
+  - If directly using the python or matlab example file, the first line should have a string formatted just as the Igor note above (*i.e.*, "TriggerTime:<number>,DwellTime:<number>,SpringConstant<numbers>")
 
 All units are assumed SI (seconds, meters, and newtons)
 	
