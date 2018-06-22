@@ -752,6 +752,21 @@ def auto_correlation_tau(x,f_user,deg_autocorrelation=1,
     tau = abs(1/linear_auto_coeffs[0])
     return tau,coeffs,auto
 
+def _zero_fec(example_split,fraction,flip_force=True):
+    approach = example_split.approach
+    retract = example_split.retract
+    f = approach.Force
+    x = approach.Time
+    n_approach = f.size
+    n_retract = retract.Force.size
+    num_points_approach = int(np.ceil(n_approach * fraction))
+    num_points_retract = int(np.ceil(n_retract * fraction))
+    # zero out everything to the approach using the autocorrelation time
+    zero_by_approach(example_split, num_points_approach,flip_force=flip_force)
+    example_split.set_tau_num_points(num_points_retract)
+    example_split.set_tau_num_points_approach(num_points_approach)
+    return example_split
+
 def zero_and_split_force_extension_curve(example,fraction=0.02):
     """
     zeros a force extension curve by its meta information and the touchoff
@@ -765,19 +780,8 @@ def zero_and_split_force_extension_curve(example,fraction=0.02):
         example as an Analysis.split_force_extension object
     """
     example_split = split_FEC_by_meta(example)
-    approach = example_split.approach
-    retract = example_split.retract 
-    f = approach.Force
-    x = approach.Time
-    n_approach = f.size
-    n_retract = retract.Force.size
-    num_points_approach = int(np.ceil(n_approach * fraction))
-    num_points_retract  = int(np.ceil(n_retract * fraction))
-    # zero out everything to the approach using the autocorrelation time 
-    zero_by_approach(example_split,num_points_approach)
-    example_split.set_tau_num_points(num_points_retract)
-    example_split.set_tau_num_points_approach(num_points_approach)
-    return example_split
+    to_ret =  _zero_fec(example_split,fraction)
+    return to_ret
 
 def _loading_rate_helper(x,y):
     if (x.size < 2):
