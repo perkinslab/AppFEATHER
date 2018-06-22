@@ -759,7 +759,11 @@ def _zero_fec(example_split,fraction,flip_force=True):
     x = approach.Time
     n_approach = f.size
     n_retract = retract.Force.size
-    num_points_approach = int(np.ceil(n_approach * fraction))
+    # allow for different velocities and offsets between approach and retract
+    dZ_appr = max(approach.ZSnsr) - min(approach.ZSnsr)
+    dZ_retr = max(retract.ZSnsr) - min(retract.ZSnsr)
+    dZ_ratio = dZ_retr / dZ_appr
+    num_points_approach = int(np.ceil(n_approach * fraction * dZ_ratio))
     num_points_retract = int(np.ceil(n_retract * fraction))
     # zero out everything to the approach using the autocorrelation time
     zero_by_approach(example_split, num_points_approach,flip_force=flip_force)
