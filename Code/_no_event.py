@@ -89,7 +89,7 @@ class no_event_parameters:
 
 
 
-def _min_points_between(autocorrelation_tau_num_points):
+def _min_points_between(tau_n):
     """
     returns the minimum recquired points between two discrete events,
     given a number of filtering points
@@ -97,7 +97,7 @@ def _min_points_between(autocorrelation_tau_num_points):
     Args:
         autocorrelation_tau_num_points: number of filtering points
     """
-    return int(np.ceil(autocorrelation_tau_num_points/4))
+    return int(np.ceil(tau_n/2))
               
 
 def _event_mask(probability,threshold):
@@ -151,20 +151,20 @@ def _no_event_chebyshev(g,epsilon,sigma):
     k = denom/sigma
     return _probability_by_cheby_k(k)
 
-def _delta(x,interp_f,n_points_diff):
+def _delta(x,interp_f,n):
     """
     gets the local centered change of interpolator, with a window of 
-    n_points_diff arond each other
+    n arond each other
 
     Args:
         x: x values to interpolate along
         interp_f: the smoothed / interpolated value to use
-        n_points_diff: number of points
+        n: number of points
     Returns :
         df, same size as x
     """
     # get the retract df spectrum
-    df_true = Analysis.local_centered_diff(interp_f,n=n_points_diff)
+    df_true = Analysis.local_centered_diff(interp_f,n=n)
     return df_true
 
 def _delta_probability(df,no_event_parameters):
@@ -201,10 +201,10 @@ def _spline_derivative(x,interpolator):
     """
     return interpolator.derivative()(x)
 
-def local_noise_integral(f,interp_f,n_points):
-    min_points_between = _min_points_between(n_points)
+def local_noise_integral(f,interp_f,tau_n):
+    min_points_between = _min_points_between(tau_n=tau_n)
     diff = f-interp_f
-    stdev = Analysis.local_stdev(diff,n_points)
+    stdev = Analysis.local_stdev(diff,n=2*tau_n)
     # essentially: when is the interpolated value 
     # at least one (local) standard deviation above the median
     # we admit an event might be possible
@@ -212,8 +212,8 @@ def local_noise_integral(f,interp_f,n_points):
                                              min_points_between)
     return local_integral
 
-def _integral_probability(f,interp_f,n_points,no_event_parameters_object):
-    local_integral = local_noise_integral(f,interp_f,n_points)
+def _integral_probability(f,interp_f,tau_n,no_event_parameters_object):
+    local_integral = local_noise_integral(f,interp_f,tau_n=tau_n)
     integral_sigma   = no_event_parameters_object.integral_sigma
     integral_epsilon   = no_event_parameters_object.integral_epsilon
     # get the propr probability
@@ -243,7 +243,7 @@ def _derivative_probability(derivative,no_event_parameters_object):
     return to_ret
 
 
-def _no_event_probability(x,interp,y,n_points,no_event_parameters_object):
+def _no_event_probability(x,interp,y,tau_n,no_event_parameters_object):
     """
     returns the no-event probability at each point in y
 
@@ -251,7 +251,7 @@ def _no_event_probability(x,interp,y,n_points,no_event_parameters_object):
         x: the x values that interp takes, see _event_probabilities
         y: the y values we are searching for an event, see _event_probabilities
         interp: see _event_probabilities
-        n_points: number of points to use in estimating r(q)=g-g* by the 
+        tau_n: number of points to use in estimating r(q)=g-g* by the
         local standard deviaiton of y-interp(x)
         no_event_params_obj: the no-event parameters object to use
         slice_fit: an optional slice to use to compute the probabilities
@@ -264,7 +264,7 @@ def _no_event_probability(x,interp,y,n_points,no_event_parameters_object):
     # get the interpolated function
     interpolated_y = interp(x_s)
     stdev_masked,_,_ = Analysis.\
-        stdevs_epsilon_sigma(y_s,interpolated_y,n_points)
+        stdevs_epsilon_sigma(y_s,interpolated_y,n=2*tau_n)
     sigma = no_event_parameters_object.sigma
     epsilon = no_event_parameters_object.epsilon
     # note: chebyshev is like
@@ -276,17 +276,18 @@ def _no_event_probability(x,interp,y,n_points,no_event_parameters_object):
     # get the probability for all the non edge cases
     probability_distribution = chebyshev
     no_event_parameters_object.last_interpolator_used = interp
+    min_points_between = _min_points_between(tau_n=tau_n)
     if (no_event_parameters_object.valid_derivative):
         derivative = _spline_derivative(x_s,interp)
         p_deriv = _derivative_probability(derivative,no_event_parameters_object)
         probability_distribution *= p_deriv
     if (no_event_parameters_object.valid_integral):
-        p_int = _integral_probability(y_s,interpolated_y,
-                                      _min_points_between(n_points),
-                                      no_event_parameters_object)
+        kw = dict(tau_n=tau_n,
+                  no_event_parameters_object=no_event_parameters_object)
+        p_int = _integral_probability(y_s,interpolated_y,**kw)
         probability_distribution *= p_int
     if (no_event_parameters_object.valid_delta):
-        df = _delta(x_s,interpolated_y,_min_points_between(n_points))
+        df = _delta(x_s,interpolated_y,n=min_points_between)
         p_delta = _delta_probability(df,no_event_parameters_object)
         probability_distribution *= p_delta        
     if (no_event_parameters_object.negative_only and 
@@ -312,7 +313,7 @@ def _no_event_probability(x,interp,y,n_points,no_event_parameters_object):
     """
     return probability_distribution,stdev_masked
         
-def _event_probabilities(x,y,interp,n_points,threshold,
+def _event_probabilities(x,y,interp,tau_n,threshold,
                          no_event_parameters_object):
     """
     determines the mask (and associated event detection information)
@@ -320,7 +321,7 @@ def _event_probabilities(x,y,interp,n_points,threshold,
     Args:
         x,y: independent and dependent variable (ie: 'q' and 'g'
         interp: the approximation to y vs x (ie: g*)
-        n_points: number of points from autocorrelation function (ie: tau)
+        tau_n: number of points from autocorrelation function (ie: tau)
 
         threshold: maximum probability that a given datapoint fits the 
         model
@@ -331,10 +332,10 @@ def _event_probabilities(x,y,interp,n_points,threshold,
             probability_distribution : no-event probability for each point in y
             stdevs: the local, windowed standard deviation, s(q)
     """
-    min_points_between = _min_points_between(n_points)
+    min_points_between = _min_points_between(tau_n=tau_n)
     probability_distribution = np.ones(x.size)
     probability_distribution,stdevs = \
-        _no_event_probability(x,interp,y,n_points=n_points,
+        _no_event_probability(x,interp,y,tau_n=tau_n,
                         no_event_parameters_object=no_event_parameters_object)
     return probability_distribution,stdevs
 
@@ -363,7 +364,7 @@ def _event_slices_from_mask(mask,min_points_between):
     return event_slices
 
 
-def _predict(x,y,n_points,interp,threshold,local_event_idx_function,
+def _predict(x,y,tau_n,interp,threshold,local_event_idx_function,
              remasking_functions=None,**kwargs):
     """
     general method to predict the event boundaries and centers
@@ -371,7 +372,7 @@ def _predict(x,y,n_points,interp,threshold,local_event_idx_function,
     Args:
         x: see _event_probabilities
         y: see _event_probabilities
-        n_points: see _event_probabilities
+        tau_n: see _event_probabilities
         interp: see _event_probabilities
         threshold: see _event_probabilities
         local_event_idx_function: a function which takes a slice of x,y,slice
@@ -386,11 +387,11 @@ def _predict(x,y,n_points,interp,threshold,local_event_idx_function,
     Returns:
         list of event slices
     """
-    min_points_between = _min_points_between(n_points)
+    min_points_between = _min_points_between(tau_n=tau_n)
     no_event_parameters_object = no_event_parameters(threshold=threshold,
                                                      **kwargs)
     probability_distribution,stdevs = \
-        _event_probabilities(x,y,interp,n_points,threshold,\
+        _event_probabilities(x,y,interp,tau_n=tau_n,threshold=threshold,\
                         no_event_parameters_object=no_event_parameters_object)
     bool_array = probability_distribution < threshold
     masks = [np.where(bool_array)[0]]
@@ -424,7 +425,7 @@ def _predict(x,y,n_points,interp,threshold,local_event_idx_function,
     event_slices_raw = list(event_slices)
     # XXX reject events with a very small time?
     event_duration = [ abs(e.stop-e.start) for e in event_slices]
-    delta_split_rem = [ int(np.ceil((n_points-(delta))/2))
+    delta_split_rem = [ int(np.ceil(tau_n-(delta//2)))
                         for delta in event_duration]
     # determine where the events are happening locally (guarentee at least
     # a search window of min_points)

@@ -57,9 +57,9 @@ class split_force_extension(object):
     def set_approach_metrics(self,slice_to_fit,interpolator):
         self.cached_approach_interpolator = interpolator
         self.cached_approach_slice_to_fit = slice_to_fit
-    def _approach_metrics(self,n_points=None,slice_fit_approach=None):
-        if (n_points is None):
-            n_points = self.tau_num_points_approach
+    def _approach_metrics(self,tau_n=None,slice_fit_approach=None):
+        if (tau_n is None):
+            tau_n = self.tau_num_points_approach
         if (slice_fit_approach is None):
             approach_surface_idx = self.get_predicted_approach_surface_index()
             slice_fit_approach= slice(0,approach_surface_idx,1)
@@ -72,7 +72,7 @@ class split_force_extension(object):
         # get the residual properties of the approach
         stdevs,epsilon,sigma = \
             stdevs_epsilon_sigma(approach_force_sliced,
-                                 approach_force_interp_sliced,n_points)
+                                 approach_force_interp_sliced,n=2*tau_n)
         return stdevs,epsilon,sigma,slice_fit_approach,spline_fit_approach
     def stdevs_epsilon_and_sigma(self,**kwargs):
         stdevs,epsilon,sigma,slice_fit_approach,spline_fit_approach = \
@@ -253,8 +253,8 @@ def _index_surface_relative(x,offset_needed):
         number of points for x to displace by offset_needed
     """    
     sep_diff = np.median(np.abs(np.diff(x)))
-    n_points = int(np.ceil(offset_needed/sep_diff))
-    return n_points
+    n = int(np.ceil(offset_needed/sep_diff))
+    return n
         
 def spline_fit_fec(tau,time_sep_force,slice_to_fit=None,**kwargs):
     """
@@ -456,10 +456,10 @@ def bhattacharyya_probability_coefficient(v1_hist,v2_hist):
     prod = p1 * p2
     return sum(np.sqrt(prod))
     
-def stdevs_epsilon_sigma(y,interpolated_y,n_points):
+def stdevs_epsilon_sigma(y,interpolated_y,n):
     # get a model for the local standard deviaiton
     diff = y-interpolated_y
-    stdevs = local_stdev(diff,n_points)
+    stdevs = local_stdev(diff,n)
     sigma = np.std(stdevs)
     epsilon = np.median(stdevs)
     return stdevs,epsilon,sigma
@@ -501,7 +501,7 @@ def _surface_index(filtered_y,y,last_less_than=True):
     median = pred_approach[surface_idx]
     return median,surface_idx
 
-def get_surface_index(obj,n_smooth,last_less_than=True):
+def get_surface_index(obj,n,last_less_than=True):
     """
     Get the surface index
     
@@ -511,12 +511,12 @@ def get_surface_index(obj,n_smooth,last_less_than=True):
         see _surface_index, except last (extra) tuple element is filtered
         obj 
     """
-    filtered_obj = filter_fec(obj,n_smooth)
+    filtered_obj = filter_fec(obj,n)
     baseline,idx = _surface_index(filtered_obj.Force,obj.Force,
                                   last_less_than=last_less_than)
     return baseline,idx,filtered_obj
 
-def zero_by_approach(split_fec,n_smooth,flip_force=True):
+def zero_by_approach(split_fec,tau_n_approach,flip_force=True):
     """
     zeros out (raw) data, using n_smooth points to do so 
     
@@ -530,7 +530,7 @@ def zero_by_approach(split_fec,n_smooth,flip_force=True):
     # PRE: assume the approach is <50% artifact and invols
     approach = split_fec.approach
     force_baseline,idx_surface,filtered_obj = \
-        get_surface_index(approach,n_smooth,last_less_than=True)
+        get_surface_index(approach,n=2*tau_n_approach,last_less_than=True)
     idx_delta = approach.Force.size-idx_surface
     # get the separation at the baseline
     separation_baseline = filtered_obj.Separation[idx_surface]
@@ -680,7 +680,7 @@ def spline_interpolator(tau_x,x,f,knots=None,deg=2):
     # note: stop is *not* included in the iterval, so we add an extra step 
     # to make it included
     if (knots is None):
-        step_knots = tau_x/2
+        step_knots = tau_x
         min_x,max_x = min(x), max(x)
         knots = np.linspace(start=min_x,stop=max_x,
                             num=np.ceil((max_x-min_x)/step_knots),
@@ -752,6 +752,26 @@ def auto_correlation_tau(x,f_user,deg_autocorrelation=1,
     tau = abs(1/linear_auto_coeffs[0])
     return tau,coeffs,auto
 
+def _zero_fec(example_split,fraction,flip_force=True):
+    approach = example_split.approach
+    retract = example_split.retract
+    f = approach.Force
+    x = approach.Time
+    n_approach = f.size
+    n_retract = retract.Force.size
+    # allow for different velocities and offsets between approach and retract
+    dZ_appr = max(approach.ZSnsr) - min(approach.ZSnsr)
+    dZ_retr = max(retract.ZSnsr) - min(retract.ZSnsr)
+    dZ_ratio = dZ_retr / dZ_appr
+    num_points_approach = int(np.ceil(n_approach * fraction * dZ_ratio))
+    num_points_retract = int(np.ceil(n_retract * fraction))
+    # zero out everything to the approach using the autocorrelation time
+    zero_by_approach(example_split, tau_n_approach=num_points_approach,
+                     flip_force=flip_force)
+    example_split.set_tau_num_points(num_points_retract)
+    example_split.set_tau_num_points_approach(num_points_approach)
+    return example_split
+
 def zero_and_split_force_extension_curve(example,fraction=0.02):
     """
     zeros a force extension curve by its meta information and the touchoff
@@ -765,19 +785,8 @@ def zero_and_split_force_extension_curve(example,fraction=0.02):
         example as an Analysis.split_force_extension object
     """
     example_split = split_FEC_by_meta(example)
-    approach = example_split.approach
-    retract = example_split.retract 
-    f = approach.Force
-    x = approach.Time
-    n_approach = f.size
-    n_retract = retract.Force.size
-    num_points_approach = int(np.ceil(n_approach * fraction))
-    num_points_retract  = int(np.ceil(n_retract * fraction))
-    # zero out everything to the approach using the autocorrelation time 
-    zero_by_approach(example_split,num_points_approach)
-    example_split.set_tau_num_points(num_points_retract)
-    example_split.set_tau_num_points_approach(num_points_approach)
-    return example_split
+    to_ret =  _zero_fec(example_split,fraction)
+    return to_ret
 
 def _loading_rate_helper(x,y):
     if (x.size < 2):

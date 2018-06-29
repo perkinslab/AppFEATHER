@@ -94,7 +94,7 @@ def safe_reslice(original_boolean,original_probability,condition,
     return new_boolean,new_probability
 
 def _condition_no_delta_significance(no_event_parameters_object,df_true,
-                                     negative_only,n_points):
+                                     negative_only):
     """
     Returns a boolean array, 1 where delta is consistent with zero...
     
@@ -104,7 +104,6 @@ def _condition_no_delta_significance(no_event_parameters_object,df_true,
         negative_only: if true, only look at negative changes (where positive
         are returned as 1)
         
-        n_points: how many points to filter by 
     Returns;
         boolean array, 1 where nothing happening 
     """                                     
@@ -146,7 +145,7 @@ def f_average_and_diff(force,n):
     diff = average_baseline-local_average
     return local_average,diff
 
-def _condition_delta_at_zero(no_event_parameters_object,force,n):
+def _condition_delta_at_zero(no_event_parameters_object,force,tau_n):
     """
     returns a boolean array with ones where we are consistent with no change
     
@@ -163,7 +162,7 @@ def _condition_delta_at_zero(no_event_parameters_object,force,n):
                  no_event_parameters_object.delta_sigma
     threshold_local_average = min_sig_df+sigma+epsilon
     baseline_interp = min_sig_df+sigma
-    local_average,diff =  f_average_and_diff(force,n)
+    local_average,diff =  f_average_and_diff(force,n=2*tau_n)
     to_ret = ( (diff >= -baseline_interp) | 
                (local_average <= threshold_local_average))
     """
@@ -188,8 +187,8 @@ def delta_mask_function(split_fec,slice_to_use,
     force = split_fec.retract.Force
     x_sliced = x[slice_to_use]
     force_sliced = force[slice_to_use]
-    n_points = split_fec.tau_num_points
-    min_points_between = _min_points_between(n_points)
+    tau_n = split_fec.tau_num_points
+    min_points_between = _min_points_between(tau_n=tau_n)
     # get the retract df spectrum
     interpolator = no_event_parameters_object.last_interpolator_used
     interp_f = interpolator(x_sliced)
@@ -205,8 +204,8 @@ def delta_mask_function(split_fec,slice_to_use,
         event_lengths = [s.stop - s.start for s in slices]
         # find the last 'long' event not at the end
         long_event_ends = [s.stop for i, s in enumerate(slices) if
-                           event_lengths[i] > n_points
-                           and s.stop < force_sliced.size - n_points]
+                           event_lengths[i] > 2*tau_n
+                           and s.stop < force_sliced.size - 2*tau_n]
         if (len(long_event_ends) > 0):
             last_long_event = long_event_ends[-1]
             offset_idx = last_long_event
@@ -245,7 +244,7 @@ def delta_mask_function(split_fec,slice_to_use,
     # find where the derivative is definitely not an event
     value_cond = \
         _condition_no_delta_significance(no_event_parameters_object,df_true,
-                                         negative_only,n_points)
+                                         negative_only)
     gt_condition = np.ones(boolean_array.size)
     gt_condition[slice_to_use] = (value_cond) | (no_event_cond)
     get_best_slice_func = lambda slice_list: \
@@ -281,11 +280,11 @@ def delta_mask_function(split_fec,slice_to_use,
             interp_f + (deriv * min_points_between/2 * dt) < sigma_df
     # XXX debugging...
     df_thresh = np.abs(sigma_df + epsilon_df)
-    average_tmp,diff = f_average_and_diff(force,n_points)    
+    average_tmp,diff = f_average_and_diff(force,n=2*tau_n)
     diff_abs_sliced = np.abs(diff[slice_to_use])
     change_insignificant = ((diff_abs_sliced < df_thresh) & 
                             (np.abs(df_true) < df_thresh))
-    min_zero_idx = n-n_points
+    min_zero_idx = n-2*tau_n
     last_greater = np.where(boolean_ret[slice_to_use])[0]
     """
     xlim = [min(x_sliced),max(x)]
@@ -339,7 +338,7 @@ def delta_mask_function(split_fec,slice_to_use,
     # find where we are consistent with zero
     consistent_with_zero_cond[slice_to_use] = \
             _condition_delta_at_zero(no_event_parameters_object,force_sliced,
-                                     n_points)
+                                     tau_n=tau_n)
     condition_non_events = (consistent_with_zero_cond | deriv_cond)
     boolean_ret, probability_updated = \
         consistent_with_zero(boolean_ret,probability_updated,
@@ -406,13 +405,13 @@ def adhesion_mask_function_for_split_fec(split_fec,slice_to_use,boolean_array,
     Returns:
         new mask and probability distribution
     """
-    n_points = split_fec.tau_num_points
+    tau_n = split_fec.tau_num_points
     probability_updated = probability.copy()      
     boolean_ret = boolean_array.copy()
     surface_index = split_fec.get_predicted_retract_surface_index()   
     # determine where the surface is 
     non_events = probability_updated > threshold
-    min_points_between = _min_points_between(n_points)
+    min_points_between = _min_points_between(tau_n=tau_n)
     min_idx = surface_index + min_points_between
     x_all = split_fec.retract.Time
     y_all = split_fec.retract.Force
@@ -443,10 +442,12 @@ def adhesion_mask_function_for_split_fec(split_fec,slice_to_use,boolean_array,
     no_event_parameters_object.negative_only = True
     if (len(events_containing_surface) == 0):
         interp = no_event_parameters_object.last_interpolator_used
+        kw = dict(tau_n=tau_n,
+                  no_event_parameters_object=no_event_parameters_object)
         probability_updated[slice_updated],_ = _no_event.\
                 _no_event_probability(x_all[slice_updated],interp,
                                       y_all[slice_updated],
-                                      n_points,no_event_parameters_object)
+                                      **kw)
         boolean_ret = (probability_updated < threshold)
         return slice_updated,boolean_ret,probability_updated
     """
@@ -486,9 +487,10 @@ def adhesion_mask_function_for_split_fec(split_fec,slice_to_use,boolean_array,
     interp_slice = interp(x_slice)
     split_fec.set_retract_knots(interp)
     # get the probability of only the negative regions
+    kw = dict(tau_n=tau_n,
+              no_event_parameters_object=no_event_parameters_object)
     probability_in_slice,_ = _no_event.\
-        _no_event_probability(x_slice,interp,y_slice,
-                              n_points,no_event_parameters_object)
+        _no_event_probability(x_slice,interp,y_slice,**kw)
     probability_updated = probability.copy()                              
     probability_updated[:min_idx] = 1
     probability_updated[slice_updated] = probability_in_slice
@@ -529,7 +531,6 @@ def _loading_rate_helper(x,y,slice_event,slice_fit=None):
         slice_fit = slice_event
     # determine the local maximum
     offset = slice_event.start
-    n_points = int(np.ceil((slice_event.stop-offset+1)/2))
     y_event = y[slice_event]
     x_event = x[slice_event]
     local_max_idx = offset
@@ -555,13 +556,13 @@ def _loading_rate_helper(x,y,slice_event,slice_fit=None):
     return fit_x,fit_y,pred,idx_above_predicted,idx_below_predicted,\
         local_max_idx
     
-def event_by_loading_rate(x,y,slice_event,interpolator,n_points):
+def event_by_loading_rate(x,y,slice_event,interpolator,tau_n):
     """
     see _loading_rate_helper 
 
     Args:
         interpolator: to use for getting the smoothed maximum negative deriv
-        n_points: number of points in the window
+        tau_n: number of points in the window
         others: see _loading_rate_helper
     Returns:
         predicted index (absolute) in x,y where we think the event is happening
@@ -578,9 +579,9 @@ def event_by_loading_rate(x,y,slice_event,interpolator,n_points):
         post_fit_start_idx =  abs_max_change_idx
     else:
         abs_median_change_idx = slice_event.start + where_le_median_rel[0]
-        post_fit_start_idx = min(slice_event.stop-_min_points_between(n_points),
+        post_fit_start_idx = min(slice_event.stop-_min_points_between(tau_n),
                                  slice_event.start + where_le_median_rel[-1])
-    delta = n_points + 1
+    delta = 2*tau_n + 1
     # only *fit* up until the median derivatice
     slice_fit = slice(abs_median_change_idx-delta,abs_median_change_idx,1)
     # *search* in the entire place before the maximum derivative
@@ -635,8 +636,8 @@ def event_by_loading_rate(x,y,slice_event,interpolator,n_points):
     return idx_above_predicted[-1]
     
 def make_event_parameters_from_split_fec(split_fec,**kwargs):
-    n_points = split_fec.tau_num_points
-    min_points_between = _min_points_between(n_points)    
+    tau_n = split_fec.tau_num_points
+    min_points_between = _min_points_between(tau_n=tau_n)
     stdevs,epsilon,sigma,slice_fit_approach,spline_fit_approach =\
         split_fec._approach_metrics()
     split_fec.set_espilon_and_sigma(epsilon,sigma)
@@ -649,7 +650,7 @@ def make_event_parameters_from_split_fec(split_fec,**kwargs):
     interpolator_approach_f = spline_fit_approach(interpolator_approach_x)
     df_approach = _no_event._delta(interpolator_approach_x,
                                    interpolator_approach_f,
-                                   min_points_between)
+                                   n=min_points_between)
     delta_epsilon,delta_sigma = np.median(df_approach),np.std(df_approach)
     abs_df_approach = np.abs(df_approach)
     delta_abs_epsilon, delta_abs_sigma = np.median(abs_df_approach),\
@@ -660,7 +661,7 @@ def make_event_parameters_from_split_fec(split_fec,**kwargs):
     approach_noise_integral = _no_event.\
         local_noise_integral(approach_f,
                              interpolator_approach_f,
-                             min_points_between)
+                             tau_n=tau_n)
     integral_epsilon = np.median(approach_noise_integral)
     integral_sigma = np.std(approach_noise_integral)
     """
@@ -707,7 +708,7 @@ def _predict_helper(split_fec,threshold,remasking_functions,**kwargs):
     """
     retract = split_fec.retract
     time,separation,force = retract.Time,retract.Separation,retract.Force
-    n_points = split_fec.tau_num_points
+    tau_n = split_fec.tau_num_points
     # N degree b-spline has continuous (N-1) derivative
     interp_retract = split_fec.retract_spline_interpolator()
     # set the knots based on the initial interpolator, so that
@@ -718,13 +719,13 @@ def _predict_helper(split_fec,threshold,remasking_functions,**kwargs):
     local_fitter = lambda *_args,**_kwargs: \
                    event_by_loading_rate(*_args,
                                          interpolator=interp_retract,
-                                         n_points=n_points,
+                                         tau_n=tau_n,
                                          **_kwargs)
     # call the predict function
     final_kwargs = dict(valid_delta=False,negative_only=False,**approach_dict)
     to_ret = _predict(x=time,
                       y=force,
-                      n_points=n_points,
+                      tau_n=tau_n,
                       interp=interp_retract,
                       threshold=threshold,
                       local_event_idx_function=local_fitter,
@@ -770,7 +771,7 @@ def _predict_split_fec(example_split,threshold,f_refs=None,**kwargs):
     example_split.approach = approach_orig
     return pred_info
 
-def _predict_full(example,threshold=1e-2,f_refs=None,tau_fraction=0.02,
+def _predict_full(example,threshold=1e-2,f_refs=None,tau_fraction=0.01,
                   **kwargs):
     """
     see predict, example returns tuple of <split FEC,prediction_info>. Except:
