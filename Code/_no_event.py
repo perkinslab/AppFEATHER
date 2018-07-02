@@ -169,8 +169,8 @@ def _delta(x,interp_f,n):
 
 def _delta_probability(df,no_event_parameters):
     negative_only=no_event_parameters.negative_only
-    epsilon = no_event_parameters.delta_epsilon
-    sigma = no_event_parameters.delta_sigma
+    epsilon = no_event_parameters.epsilon
+    sigma = no_event_parameters.sigma
     min_signal = (epsilon+sigma)
     if (negative_only):
         baseline = -min_signal

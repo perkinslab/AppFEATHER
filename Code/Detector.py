@@ -111,7 +111,7 @@ def _condition_no_delta_significance(no_event_parameters_object,df_true,
     sigma = no_event_parameters_object.sigma
     epsilon_approach = no_event_parameters_object.delta_epsilon
     sigma_approach = no_event_parameters_object.delta_sigma
-    min_signal = (epsilon_approach+sigma_approach)
+    min_signal = (epsilon+sigma)
     if (negative_only):
         baseline = -min_signal
     else:
@@ -237,7 +237,6 @@ def delta_mask_function(split_fec,slice_to_use,
     tol = 1e-9
     no_event_cond = (1-ratio_probability<tol)
     """
-    plt.close()
     plt.semilogy(ratio_probability)
     plt.axhline(1-tol)
     plt.show()
@@ -260,17 +259,15 @@ def delta_mask_function(split_fec,slice_to_use,
     boolean_ret = probability_updated < threshold
     """
     xlim = min(x), max(x)
-    plt.close()
     plt.subplot(2, 1, 1)
     plt.plot(x, force)
     plt.plot(x_sliced, interp_f)
     plt.xlim(xlim)
     plt.subplot(2, 1, 2)
-    plt.plot(x_sliced, boolean_array[slice_to_use] + 2.1,label="orig")
-    plt.plot(x_sliced, value_cond + 1.1,label="No Delta")
-    plt.plot(x_sliced, no_event_cond,label="Ratio")
+    plt.plot(x_sliced, boolean_array[slice_to_use] + 2.1)
+    plt.plot(x_sliced, value_cond + 1.1)
+    plt.plot(x_sliced, no_event_cond)
     plt.xlim(xlim)
-    plt.legend()
     plt.show()
     """
     deriv = _no_event._spline_derivative(x_sliced,interpolator)
@@ -291,7 +288,6 @@ def delta_mask_function(split_fec,slice_to_use,
     last_greater = np.where(boolean_ret[slice_to_use])[0]
     """
     xlim = [min(x_sliced),max(x)]
-    plt.close()
     plt.subplot(3,1,1)
     plt.plot(x,force)
     plt.plot(x,average_tmp)
@@ -330,7 +326,6 @@ def delta_mask_function(split_fec,slice_to_use,
             split_fec.zero_retract_force(offset_zero_force)
             interp_f -= offset_zero_force
     """
-    plt.close()
     plt.subplot(2,1,1)
     plt.plot(x,boolean_ret)
     plt.subplot(2,1,2)    
