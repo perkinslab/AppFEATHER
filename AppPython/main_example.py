@@ -13,20 +13,7 @@ sys.path.append("../")
 from Code import _command_line_config,Detector
 
 
-
-def run():
-    """
-    <Description>
-
-    Args:
-        param1: This is the first param.
-    
-    Returns:
-        This is a description of what is returned.
-    """
-    # there are a couple of ways to call FEATHER in python. 
-    # # (1) through an intermediate '.csv' file
-    in_file = '../Data/example_0.csv'
+def _analyze_file(in_file):
     data = np.loadtxt(in_file,delimiter=',',skiprows=0)
     header_info = _command_line_config._parse_csv_header(in_file)
     time,sep,force = data[:,0],data[:,1],data[:,2]
@@ -48,7 +35,7 @@ def run():
                                                            threshold=threshold)
     # make sure the two methods are consistent
     assert np.allclose(event_indices_1,event_indices_2) , \
-        "Programming error; FEATHEr methods are identical"
+        "Programming error; FEATHER methods should be identical"
     # POST: they are consistent. go ahead and plot force vs time, add lines
     # where an event is predicted
     print("Found events at indices: {}".format(event_indices_1))
@@ -56,10 +43,26 @@ def run():
     force_pN_zero = force_pN - force_pN[force_pN.size//10]
     plt.plot(time,force_pN_zero)
     for i in event_indices_1:
-        plt.axvline(time[i])
+        plt.axvline(time[i],color='r',linestyle='--')
     plt.xlabel("Time (s)")
     plt.ylabel("Force (pN)")
     plt.show()
+
+def run():
+    """
+    <Description>
+
+    Args:
+        param1: This is the first param.
+    
+    Returns:
+        This is a description of what is returned.
+    """
+    # there are a couple of ways to call FEATHER in python. 
+    # # (1) through an intermediate '.csv' file
+    for i in range(19):
+        in_file = '../Data/example_{:d}.csv'.format(i)
+        _analyze_file(in_file)
     
 
 if __name__ == "__main__":
