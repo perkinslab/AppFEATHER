@@ -63,7 +63,7 @@ For example, in the image below, we have installed FEATHER in the home ('~') sub
 
 # Running the example
 
-Open git bash for Windows (or terminal for Mac). Navigate to the repository installed above. If you type ls, you should see something like:
+Open git bash for Windows (or terminal for Mac). Navigate to the repository installed above. If you type dir (ls for Mac), you should see something like:
 
 $ ls
 __init__.py  AppMatlab/  Code/  README.md   UtilGeneral/  UtilIgorPro/
@@ -106,7 +106,7 @@ You can also run FEATHER directly from the command line, as described above. FEA
 		- where "[X]" is any letters, and "[#]" is any digits.
     - For example, "Image0994Time", "Image0994Sep","Image0994Force".
     - If directly using the example .ipf file, the note must have a string like:
-        - "TriggerTime:[number],DwellTime:[number],SpringConstant[numbers]" without quotes, where [number] is a value in SI units (*e.g.* 0.123e-6, without brackets) and the values are repsectively the end of the approach, the length of the dwell at the surface before retraction, and the spring constnat of the force probe.
+        - "TriggerTime:[number],DwellTime:[number],SpringConstant[numbers]" without quotes, where [number] is a value in SI units (*e.g.* 0.123e-6, without brackets) and the values are respectively the end of the approach, the length of the dwell at the surface before retraction, and the spring constant of the force probe.
 - Files ending with '.mat', formatted like '-v7.3' (see: mathworks.com/help/matlab/ref/save.html#bvmz_n7), with 'time', 'sep', and 'force' data sets. This is essentially an hdf5 file.
 - Files ending with '.csv', where there are three comma-delimited columns of length N, which are the time, separation, and force columns.
   - If directly using the python or matlab example file, the first line should have a string formatted just as the Igor note described above.

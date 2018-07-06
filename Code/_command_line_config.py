@@ -40,13 +40,13 @@ def _parse_csv_header(in_file):
         assert (header_l1 is not None) and (len(header_l1) > 0)
         for k in keys:
             pattern=r"""
-                     [$,\s]           # start, space, or comma
+                     [$,\s#]          # start, space, or comma
                      {:s}             # our literal string
                      \s*:\s*          # literal colon, optional spaces
                      ([^,\s]+)        # any non-commas or spaces (a #)
                      """.format(k)
             match = re.search(pattern,header_l1,re.VERBOSE)
-            assert match is not None
+            assert match is not None , "Line {:s} didn't have {:s}".format(header_l1,k)
             check = match.group(1)
             try:
                 value = float(check)
