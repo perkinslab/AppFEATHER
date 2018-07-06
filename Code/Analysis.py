@@ -72,7 +72,8 @@ class split_force_extension(object):
         # get the residual properties of the approach
         stdevs,epsilon,sigma = \
             stdevs_epsilon_sigma(approach_force_sliced,
-                                 approach_force_interp_sliced,n=2*tau_n)
+                                 approach_force_interp_sliced,
+                                 n=_tau_to_n(tau_n))
         return stdevs,epsilon,sigma,slice_fit_approach,spline_fit_approach
     def stdevs_epsilon_and_sigma(self,**kwargs):
         stdevs,epsilon,sigma,slice_fit_approach,spline_fit_approach = \
@@ -241,6 +242,21 @@ class split_force_extension(object):
             "Couldn't find surface in retract. Z_retract never reached surface."
         # return the first time we are above the surface Z...
         return where_retract_above_surface[0]
+
+
+def _tau_to_n(tau_n):
+    return 2*tau_n
+
+
+def _min_points_between(tau_n):
+    """
+    returns the minimum recquired points between two discrete events,
+    given a number of filtering points
+
+    Args:
+        autocorrelation_tau_num_points: number of filtering points
+    """
+    return int(np.ceil(tau_n / 2))
 
 def _index_surface_relative(x,offset_needed):
     """
@@ -530,7 +546,8 @@ def zero_by_approach(split_fec,tau_n_approach,flip_force=True):
     # PRE: assume the approach is <50% artifact and invols
     approach = split_fec.approach
     force_baseline,idx_surface,filtered_obj = \
-        get_surface_index(approach,n=2*tau_n_approach,last_less_than=True)
+        get_surface_index(approach,n=_tau_to_n(tau_n_approach),
+                          last_less_than=True)
     idx_delta = approach.Force.size-idx_surface
     # get the separation at the baseline
     separation_baseline = filtered_obj.Separation[idx_surface]

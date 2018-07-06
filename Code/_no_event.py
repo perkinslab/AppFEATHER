@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from . import Analysis
 from itertools import chain
+from .Analysis import _tau_to_n,_min_points_between
 
 class prediction_info:
     def __init__(self,event_idx,event_slices,local_stdev,interp,mask,
@@ -86,18 +87,6 @@ class no_event_parameters:
     def _set_valid_derivative(self,flag):
         self.valid_derivative = (((self.derivative_epsilon is not None) and
                                   (self.derivative_sigma is not None)) and flag)
-
-
-
-def _min_points_between(tau_n):
-    """
-    returns the minimum recquired points between two discrete events,
-    given a number of filtering points
-    
-    Args:
-        autocorrelation_tau_num_points: number of filtering points
-    """
-    return int(np.ceil(tau_n/2))
               
 
 def _event_mask(probability,threshold):
@@ -204,7 +193,7 @@ def _spline_derivative(x,interpolator):
 def local_noise_integral(f,interp_f,tau_n):
     min_points_between = _min_points_between(tau_n=tau_n)
     diff = f-interp_f
-    stdev = Analysis.local_stdev(diff,n=2*tau_n)
+    stdev = Analysis.local_stdev(diff,n=_tau_to_n(tau_n))
     # essentially: when is the interpolated value 
     # at least one (local) standard deviation above the median
     # we admit an event might be possible
@@ -264,7 +253,7 @@ def _no_event_probability(x,interp,y,tau_n,no_event_parameters_object):
     # get the interpolated function
     interpolated_y = interp(x_s)
     stdev_masked,_,_ = Analysis.\
-        stdevs_epsilon_sigma(y_s,interpolated_y,n=2*tau_n)
+        stdevs_epsilon_sigma(y_s,interpolated_y,n=_tau_to_n(tau_n))
     sigma = no_event_parameters_object.sigma
     epsilon = no_event_parameters_object.epsilon
     # note: chebyshev is like
@@ -332,8 +321,6 @@ def _event_probabilities(x,y,interp,tau_n,threshold,
             probability_distribution : no-event probability for each point in y
             stdevs: the local, windowed standard deviation, s(q)
     """
-    min_points_between = _min_points_between(tau_n=tau_n)
-    probability_distribution = np.ones(x.size)
     probability_distribution,stdevs = \
         _no_event_probability(x,interp,y,tau_n=tau_n,
                         no_event_parameters_object=no_event_parameters_object)

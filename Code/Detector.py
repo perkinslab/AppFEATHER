@@ -11,6 +11,7 @@ from . import Analysis
 from ._no_event import _min_points_between,_predict,\
     _probability_by_cheby_k,_no_event_chebyshev,_event_slices_from_mask
 from . import _no_event
+from .Analysis import _tau_to_n
 
 def get_slice_by_max_value(interp_sliced,offset,slice_list):
     """
@@ -162,7 +163,7 @@ def _condition_delta_at_zero(no_event_parameters_object,force,tau_n):
                  no_event_parameters_object.delta_sigma
     threshold_local_average = min_sig_df+sigma+epsilon
     baseline_interp = min_sig_df+sigma
-    local_average,diff =  f_average_and_diff(force,n=2*tau_n)
+    local_average,diff =  f_average_and_diff(force,n=_tau_to_n(tau_n))
     to_ret = ( (diff >= -baseline_interp) | 
                (local_average <= threshold_local_average))
     """
@@ -204,8 +205,8 @@ def delta_mask_function(split_fec,slice_to_use,
         event_lengths = [s.stop - s.start for s in slices]
         # find the last 'long' event not at the end
         long_event_ends = [s.stop for i, s in enumerate(slices) if
-                           event_lengths[i] > 2*tau_n
-                           and s.stop < force_sliced.size - 2*tau_n]
+                           event_lengths[i] > _tau_to_n(tau_n)
+                           and s.stop < force_sliced.size -_tau_to_n(tau_n)]
         if (len(long_event_ends) > 0):
             last_long_event = long_event_ends[-1]
             offset_idx = last_long_event
@@ -280,11 +281,11 @@ def delta_mask_function(split_fec,slice_to_use,
             interp_f + (deriv * min_points_between/2 * dt) < sigma_df
     # XXX debugging...
     df_thresh = np.abs(sigma_df + epsilon_df)
-    average_tmp,diff = f_average_and_diff(force,n=2*tau_n)
+    average_tmp,diff = f_average_and_diff(force,n=_tau_to_n(tau_n))
     diff_abs_sliced = np.abs(diff[slice_to_use])
     change_insignificant = ((diff_abs_sliced < df_thresh) & 
                             (np.abs(df_true) < df_thresh))
-    min_zero_idx = n-2*tau_n
+    min_zero_idx = n-_tau_to_n(tau_n)
     last_greater = np.where(boolean_ret[slice_to_use])[0]
     """
     xlim = [min(x_sliced),max(x)]
@@ -581,7 +582,7 @@ def event_by_loading_rate(x,y,slice_event,interpolator,tau_n):
         abs_median_change_idx = slice_event.start + where_le_median_rel[0]
         post_fit_start_idx = min(slice_event.stop-_min_points_between(tau_n),
                                  slice_event.start + where_le_median_rel[-1])
-    delta = 2*tau_n + 1
+    delta = _tau_to_n(tau_n) + 1
     # only *fit* up until the median derivatice
     slice_fit = slice(abs_median_change_idx-delta,abs_median_change_idx,1)
     # *search* in the entire place before the maximum derivative
