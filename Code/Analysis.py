@@ -153,6 +153,8 @@ class split_force_extension(object):
         # for the purpose of smoothing, tau must be a certain size
         if (tau_num_points is not None):
             self.tau_num_points = max(min_tau_num_points, tau_num_points)
+            assert self.approach.Time.size > min_tau_num_points , \
+                "Not enough data"
             # we assume the rate of time sampling is  the same everywhere
             self.dt = np.median(np.abs(np.diff(self.approach.Time)))
             self.tau = self.dt*self.tau_num_points
