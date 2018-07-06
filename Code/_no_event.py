@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from . import Analysis
 from itertools import chain
-from .Analysis import _tau_to_n,_min_points_between
+from .Analysis import _tau_to_n,_min_points_between,_delta_n_remainder
 
 class prediction_info:
     def __init__(self,event_idx,event_slices,local_stdev,interp,mask,
@@ -412,7 +412,7 @@ def _predict(x,y,tau_n,interp,threshold,local_event_idx_function,
     event_slices_raw = list(event_slices)
     # XXX reject events with a very small time?
     event_duration = [ abs(e.stop-e.start) for e in event_slices]
-    delta_split_rem = [ int(np.ceil(tau_n-(delta//2)))
+    delta_split_rem = [ int(np.ceil(_delta_n_remainder(tau_n)-(delta//2)))
                         for delta in event_duration]
     # determine where the events are happening locally (guarentee at least
     # a search window of min_points)

@@ -11,7 +11,7 @@ from . import Analysis
 from ._no_event import _min_points_between,_predict,\
     _probability_by_cheby_k,_no_event_chebyshev,_event_slices_from_mask
 from . import _no_event
-from .Analysis import _tau_to_n
+from .Analysis import _tau_to_n,_deriv_n,_def_tau_f,_delta_n_remainder
 
 def get_slice_by_max_value(interp_sliced,offset,slice_list):
     """
@@ -278,7 +278,7 @@ def delta_mask_function(split_fec,slice_to_use,
     sigma_df = no_event_parameters_object.delta_abs_sigma
     epsilon_df = no_event_parameters_object.delta_abs_epsilon
     deriv_cond[slice_to_use] = \
-            interp_f + (deriv * min_points_between/2 * dt) < sigma_df
+            interp_f + (deriv * _deriv_n(tau_n) * dt) < sigma_df
     # XXX debugging...
     df_thresh = np.abs(sigma_df + epsilon_df)
     average_tmp,diff = f_average_and_diff(force,n=_tau_to_n(tau_n))
@@ -772,8 +772,8 @@ def _predict_split_fec(example_split,threshold,f_refs=None,**kwargs):
     example_split.approach = approach_orig
     return pred_info
 
-def _predict_full(example,threshold=1e-2,f_refs=None,tau_fraction=0.01,
-                  **kwargs):
+def _predict_full(example,threshold=1e-2,f_refs=None,
+                  tau_fraction=_def_tau_f(),**kwargs):
     """
     see predict, example returns tuple of <split FEC,prediction_info>. Except:
     

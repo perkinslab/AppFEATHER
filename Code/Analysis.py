@@ -247,7 +247,6 @@ class split_force_extension(object):
 def _tau_to_n(tau_n):
     return 2*tau_n
 
-
 def _min_points_between(tau_n):
     """
     returns the minimum recquired points between two discrete events,
@@ -256,7 +255,16 @@ def _min_points_between(tau_n):
     Args:
         autocorrelation_tau_num_points: number of filtering points
     """
-    return int(np.ceil(tau_n / 2))
+    return int(np.ceil(tau_n/2))
+
+def _deriv_n(tau_n):
+    return int(np.ceil(tau_n/4))
+
+def _delta_n_remainder(tau_n):
+    return tau_n
+
+def _def_tau_f():
+    return 1e-2
 
 def _index_surface_relative(x,offset_needed):
     """
@@ -789,7 +797,7 @@ def _zero_fec(example_split,fraction,flip_force=True):
     example_split.set_tau_num_points_approach(num_points_approach)
     return example_split
 
-def zero_and_split_force_extension_curve(example,fraction=0.02):
+def zero_and_split_force_extension_curve(example,fraction=_def_tau_f()):
     """
     zeros a force extension curve by its meta information and the touchoff
     on the approach
