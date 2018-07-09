@@ -110,6 +110,7 @@ You can also run FEATHER directly from the command line, as described above. FEA
 - Files ending with '.mat', formatted like '-v7.3' (see: mathworks.com/help/matlab/ref/save.html#bvmz_n7), with 'time', 'sep', and 'force' data sets. This is essentially an hdf5 file.
 - Files ending with '.csv', where there are three comma-delimited columns of length N, which are the time, separation, and force columns.
   - If directly using the python or matlab example file, the first line should have a string formatted just as the Igor note described above.
+  - In addition, if using in Matlab, the second line of the file is ignored (assumed to be used to keeping track if events).
 
 All units are assumed SI (seconds, meters, and newtons)
 	
