@@ -83,7 +83,7 @@ def read_matlab_file_into_fec(input_file):
     
 
 def make_fec(time,separation,force,spring_constant,trigger_time,dwell_time,
-             name="",DwellSetting=1,Invols=1,**kwargs):
+             name="",Velocity=1,DwellSetting=1,Invols=1,**kwargs):
     """
     given time,sep, and force and 'meta' keywords, returns the fec that FEATHER
     can use
@@ -96,12 +96,13 @@ def make_fec(time,separation,force,spring_constant,trigger_time,dwell_time,
     Returns:
          force extension curve object which FEATHER can use
     """
-    meta_dict = dict(K=spring_constant,
+    meta_dict = dict(SpringConstant=spring_constant,
                      Name=name,
                      Invols=1,
                      TriggerTime=trigger_time,
                      DwellTime=dwell_time,
                      DwellSetting=DwellSetting,
+                     Velocity=Velocity,
                      **kwargs)
     data = TimeSepForceObj.data_obj_by_columns_and_dict(time=time,
                                                         sep=separation,
