@@ -96,9 +96,9 @@ FEATHER has many more example force-extension curves in the Data subdirectory. I
 ## Running FEATHER on your own data
 
 
-It is recommended to run FEATHER through one of the interfaces (python, Matlab, or Igor Pro). These interfaces deal with data management for you. Each example file (Matlab, Python, and Igor Pro, listed above), loads either a pxp or a csv file before calling FEATHER. To run on your data, modify the example to run on your file.
+It is recommended to run FEATHER through one of the interfaces (python, Matlab, or Igor Pro). These interfaces deal with data management for you. Each example file (Matlab, Python, and Igor Pro, listed above), loads either a pxp or a csv file before calling FEATHER. To run on your data, modify the example to run on your data. In this manner, any data you have loaded in the programming language can be analyzed with FEATHER
 
-You can also run FEATHER directly from the command line, as described above. FEATHER's command line arguments can be found by calling the program with -h, as follows:
+You can also run FEATHER directly from the command line. FEATHER's command line arguments can be found by calling the program with -h, as follows:
 
 
 ~~~~			
@@ -126,7 +126,20 @@ optional arguments:
                         path to output the associated data (string)
 ~~~~			
 
-FEATHER accepts the following formats for the input file. Using the command line, the output file is always written as a single column, with one event index per line.
+The following example will create the event indices in the file "output.txt" in the current directory.
+
+~~~~
+python2 main_feather.py
+    -tau 1e-2 \
+    -threshold 1e-3 \
+    -spring_constant 6.67e-3 \
+    -trigger_time 0.382 \
+    -dwell_time 0.992 \
+    -file_input ../Data/example_0.csv \
+    -file_output ./output.txt \
+~~~~
+
+Note that '\' is the line continuation character. FEATHER accepts the following formats for the input file. Using the command line, the output file is always written as a single column, with one event index per line.
 
 ### .pxp (Igor Pro) formatting
 
