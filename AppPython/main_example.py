@@ -47,6 +47,15 @@ def _analyze_file(in_file):
     plt.xlabel("Time (s)")
     plt.ylabel("Force (pN)")
     plt.show()
+    # # Next, we show how to get do event detection based only on the approach
+    # first, we get just the retract, which starts at t=(TriggerTime+DwellTime)
+    retract = Analysis.zero_and_split_force_extension_curve(fec,tau).retract
+    # next, we use <pct_pseudo_approach> of the retract to make an approach
+    pct_pseudo_approach = 0.1
+    split = UtilFEATHER._split_from_retract(retract,pct_pseudo_approach,tau)
+    # we can then save this csv out 
+    
+    
 
 def run():
     """
