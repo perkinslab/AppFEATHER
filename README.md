@@ -139,7 +139,7 @@ python2 main_feather.py
     -file_output ./output.txt \
 ~~~~
 
-Note that '\' is the line continuation character. FEATHER accepts the following formats for the input file. Using the command line, the output file is always written as a single column, with one event index per line.
+Note that '\\' is the line continuation character. FEATHER accepts the following formats for the input file. Using the command line, the output file is always written as a single column, with one event index per line.
 
 ### .pxp (Igor Pro) formatting
 
