@@ -98,28 +98,30 @@ FEATHER has many more example force-extension curves in the Data subdirectory. I
 
 It is recommended to run FEATHER through one of the interfaces (python, Matlab, or Igor Pro). These interfaces deal with data management for you. Each example file (Matlab, Python, and Igor Pro, listed above), loads either a pxp or a csv file before calling FEATHER. To run on your data, modify the example to run on your file.
 
->$:python main_feather.py -h
-> usage: main_feather.py [-h] [-tau tau] -threshold threshold -spring_constant
->                       spring_constant -trigger_time trigger_time -dwell_time
->                       dwell_time -file_input file_input -file_output
->                       file_output
->
->Predict event locations in a data file
->
->optional arguments:
->  -h, --help            show this help message and exit
->  -tau tau              tau fraction of curve (0,1)
->  -threshold threshold  probability threshold (0,1)
->  -spring_constant spring_constant
->                        spring constant of the probe (N/m)
->  -trigger_time trigger_time
->                        time at which approach ends (s)
->  -dwell_time dwell_time
->                        time between approach end and retract start (s)
->  -file_input file_input
->                        path to the force-extension curve file (string)
->  -file_output file_output
->                        path to output the associated data (string)
+~~~~python			
+$:python main_feather.py -h
+ usage: main_feather.py [-h] [-tau tau] -threshold threshold -spring_constant
+                       spring_constant -trigger_time trigger_time -dwell_time
+                       dwell_time -file_input file_input -file_output
+                       file_output
+
+Predict event locations in a data file
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -tau tau              tau fraction of curve (0,1)
+  -threshold threshold  probability threshold (0,1)
+  -spring_constant spring_constant
+                        spring constant of the probe (N/m)
+  -trigger_time trigger_time
+                        time at which approach ends (s)
+  -dwell_time dwell_time
+                        time between approach end and retract start (s)
+  -file_input file_input
+                        path to the force-extension curve file (string)
+  -file_output file_output
+                        path to output the associated data (string)
+~~~~			
 
 You can also run FEATHER directly from the command line, as described above. In particular, the  FEATHER accepts the following formats (all units are assumed SI):
 
