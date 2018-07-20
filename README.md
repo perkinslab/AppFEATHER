@@ -126,7 +126,7 @@ optional arguments:
                         path to output the associated data (string)
 ~~~~			
 
-The following example will create the event indices in the file "output.txt" in the current directory.
+ Using the command line, the output file is always written as a single column, with one event index per line. The following example will create the event indices in the file "output.txt" in the current directory.
 
 ~~~~
 python2 main_feather.py
@@ -139,7 +139,7 @@ python2 main_feather.py
     -file_output ./output.txt \
 ~~~~
 
-Note that '\\' is the line continuation character. FEATHER accepts the following formats for the input file. Using the command line, the output file is always written as a single column, with one event index per line.
+Note that '\\' is the line continuation character. FEATHER accepts the following formats for the input file.
 
 ### .pxp (Igor Pro) formatting
 
@@ -165,7 +165,20 @@ Note that '\\' is the line continuation character. FEATHER accepts the following
         - Note: all indices are zero-offset into the remaining data in the csv file. In other words, index 0 would mean line 3
     -Line 3 to end: the time, separation, and force as comma-delimited columns. 
 
-## Custp
+## Custom force-extension curves
+
+Some applications (*e.g.* complicated triggering or refolding schemes) may only have a retraction. In this case, a suitable portion of the retraction lacking any events (*e.g.* post-detachment) can be 'pasted' onto the approach. An example of this process is shown in the file AppPython/main_example.py (the function _test_FEATHER_retract_only).
+
+The easiest way to create these custom waves (as demonstrated in the file mentioend above) is as follows:
+
+1. Get the retraction curve
+2. Determine the part of the retraction curve without events (often, the last 10-50 percent), which will be called the 'psuedo' approach
+3. Prepend the 'psuedo' approach to the retraction.
+       - Offset the separation of the 'psuedo' approach so it and the retraction curve have a common zero
+       - Adjust the time so that t=0 at point 0 of the prepended data and continues monotonically
+       - The total length of the new retraction is now greater than it was before
+4. Run FEATHER, with the DwellTime set to 0 and and TriggerTime set to the total length of the 'psuedo' approach
+
 
 	
 ## Troubleshooting
