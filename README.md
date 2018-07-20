@@ -95,9 +95,35 @@ FEATHER has many more example force-extension curves in the Data subdirectory. I
 	
 ## Running FEATHER on your own data
 
+
 It is recommended to run FEATHER through one of the interfaces (python, Matlab, or Igor Pro). These interfaces deal with data management for you. Each example file (Matlab, Python, and Igor Pro, listed above), loads either a pxp or a csv file before calling FEATHER. To run on your data, modify the example to run on your file.
 
-You can also run FEATHER directly from the command line, as described above. FEATHER accepts the following formats:
+>$:python main_feather.py -h
+> usage: main_feather.py [-h] [-tau tau] -threshold threshold -spring_constant
+>                       spring_constant -trigger_time trigger_time -dwell_time
+>                       dwell_time -file_input file_input -file_output
+>                       file_output
+>
+>Predict event locations in a data file
+>
+>optional arguments:
+>  -h, --help            show this help message and exit
+>  -tau tau              tau fraction of curve (0,1)
+>  -threshold threshold  probability threshold (0,1)
+>  -spring_constant spring_constant
+>                        spring constant of the probe (N/m)
+>  -trigger_time trigger_time
+>                        time at which approach ends (s)
+>  -dwell_time dwell_time
+>                        time between approach end and retract start (s)
+>  -file_input file_input
+>                        path to the force-extension curve file (string)
+>  -file_output file_output
+>                        path to output the associated data (string)
+
+You can also run FEATHER directly from the command line, as described above. In particular, the  FEATHER accepts the following formats (all units are assumed SI):
+
+### .pxp (Igor Pro) formatting
 
 - Files ending with '.pxp' with names formatted as below. 
     - These are Igor Pro files, and should have a separation, force, and time wave, named like:
@@ -106,12 +132,23 @@ You can also run FEATHER directly from the command line, as described above. FEA
     - For example, "Image0994Time", "Image0994Sep","Image0994Force".
     - If directly using the example .ipf file, the note must have a string like:
         - "TriggerTime:[number],DwellTime:[number],SpringConstant[numbers]" without quotes, where [number] is a value in SI units (*e.g.* 0.123e-6, without brackets) and the values are respectively the end of the approach, the length of the dwell at the surface before retraction, and the spring constant of the force probe.
-- Files ending with '.mat', formatted like '-v7.3' (see: mathworks.com/help/matlab/ref/save.html#bvmz_n7), with 'time', 'sep', and 'force' data sets. This is essentially an hdf5 file.
-- Files ending with '.csv', where there are three comma-delimited columns of length N, which are the time, separation, and force columns.
-  - If directly using the python or matlab example file, the first line should have a string formatted just as the Igor note described above.
-  - In addition, if using in Matlab, the second line of the file is ignored (assumed to be used to keeping track if events).
 
-All units are assumed SI (seconds, meters, and newtons)
+### .mat (Matlab) formatting
+
+- Files ending with '.mat', formatted like '-v7.3' (see: mathworks.com/help/matlab/ref/save.html#bvmz_n7), with 'time', 'sep', and 'force' data sets. This is essentially an hdf5 file.
+
+### .csv (Generic) formatting
+
+- Files ending with '.csv', where there are three comma-delimited columns of length N, which are the time, separation, and force columns, with the following lines:
+    - Line 1: A literal '#', followed by key-value pairs of experimental information, formatted like 'key:value'.
+        - For example (and most relevant to FEATHER) 'SpringConstant:0.001,DwellTime:0,TriggerTime:1'
+    - Line 2: A literal '#EventIndices,formatted as [[start1,end1],...]:', followed by an csv list of event start and end index pairs, formatted like '[start,end]'
+        - For example, '[[1,2],[7,8]]' means two events, where one events starts at index 1 and stops at 2, and the other starts at 7 and ends at 8.
+        - Note: all indices are zero-offset into the remaining data in the csv file. In other words, index 0 would mean line 3
+    -Line 3 to end: the time, separation, and force as comma-delimited columns. 
+
+## Custp
+
 	
 ## Troubleshooting
 

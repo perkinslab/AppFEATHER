@@ -34,21 +34,22 @@ def parse_and_run():
                         **common)
     # # 'meta' variables
     parser.add_argument('-spring_constant', metavar='spring_constant', 
-                        type=float,help='spring constant of the probe',
+                        type=float,help='spring constant of the probe (N/m)',
                         **common)
     parser.add_argument('-trigger_time', metavar='trigger_time', 
-                        type=float,help='time at which approach ends',
+                        type=float,help='time at which approach ends (s)',
                         **common)
     parser.add_argument('-dwell_time', metavar='dwell_time', 
                         type=float,
-                        help='time between end of approach and retract start',
+                        help='time between approach end and retract start (s)',
                         **common)
     # path to the file
     parser.add_argument('-file_input',metavar="file_input",type=str,
-                        help="path to the force-extension curve file",
+                        help="path to the force-extension curve file (string)",
                         **common)
     parser.add_argument('-file_output',metavar="file_output",type=str,
-                        help="path to output the associated data",**common)
+                        help="path to output the associated data (string)",
+                        **common)
     # parse all the inputs
     args = parser.parse_args()
     out_file = os.path.normpath(args.file_output)
