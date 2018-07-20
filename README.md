@@ -5,7 +5,6 @@
 This repository contains FEATHER (*F*orce *E*xtension *A*nalysis using a *T*estable *H*ypothesis for *E*vent *R*ecognition), a freely available technique for finding rupture events in force spectroscopy data.
 
 
-
 # Citing FEATHER
 
 If you use FEATHER, please use the following citation:
@@ -14,7 +13,7 @@ xxx
 
 # Video tutorial
 
-The steps in this text document are covered by [this video tutorial](https://www.google.com "FEATHER video tutorial")
+The steps in this text document are covered by [this video tutorial](https://www.youtube.com/watch?v=F2N1cFR1FzA "FEATHER video tutorial").
 
 # Installing
 
