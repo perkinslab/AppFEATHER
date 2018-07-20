@@ -98,7 +98,10 @@ FEATHER has many more example force-extension curves in the Data subdirectory. I
 
 It is recommended to run FEATHER through one of the interfaces (python, Matlab, or Igor Pro). These interfaces deal with data management for you. Each example file (Matlab, Python, and Igor Pro, listed above), loads either a pxp or a csv file before calling FEATHER. To run on your data, modify the example to run on your file.
 
-~~~~python			
+You can also run FEATHER directly from the command line, as described above. FEATHER's command line arguments can be found by calling the program with -h, as follows:
+
+
+~~~~			
 $:python main_feather.py -h
  usage: main_feather.py [-h] [-tau tau] -threshold threshold -spring_constant
                        spring_constant -trigger_time trigger_time -dwell_time
@@ -123,7 +126,7 @@ optional arguments:
                         path to output the associated data (string)
 ~~~~			
 
-You can also run FEATHER directly from the command line, as described above. In particular, the  FEATHER accepts the following formats (all units are assumed SI):
+FEATHER accepts the following formats for the input file. Using the command line, the output file is always written as a single column, with one event index per line.
 
 ### .pxp (Igor Pro) formatting
 
