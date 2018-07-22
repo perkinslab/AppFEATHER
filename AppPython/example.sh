@@ -16,14 +16,13 @@ dateStr=`date +%Y-%m-%d:%H:%M:%S`
 
 # Returns:
 
-cd .. 
 python2 main_feather.py\
     -tau 1e-2 \
     -threshold 1e-3 \
     -spring_constant 6.67e-3 \
     -trigger_time 0.382 \
     -dwell_time 0.992 \
-    -file_input ../Data/example.csv \
+    -file_input ../Data/example_0.csv \
     -file_output ./output.txt \
 
 

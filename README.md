@@ -95,9 +95,53 @@ FEATHER has many more example force-extension curves in the Data subdirectory. I
 	
 ## Running FEATHER on your own data
 
-It is recommended to run FEATHER through one of the interfaces (python, Matlab, or Igor Pro). These interfaces deal with data management for you. Each example file (Matlab, Python, and Igor Pro, listed above), loads either a pxp or a csv file before calling FEATHER. To run on your data, modify the example to run on your file.
 
-You can also run FEATHER directly from the command line, as described above. FEATHER accepts the following formats:
+It is recommended to run FEATHER through one of the interfaces (python, Matlab, or Igor Pro). These interfaces deal with data management for you. Each example file (Matlab, Python, and Igor Pro, listed above), loads either a pxp or a csv file before calling FEATHER. To run on your data, modify the example to run on your data. In this manner, any data you have loaded in the programming language can be analyzed with FEATHER
+
+You can also run FEATHER directly from the command line. FEATHER's command line arguments can be found by calling the program with -h, as follows:
+
+
+~~~~			
+$:python main_feather.py -h
+ usage: main_feather.py [-h] [-tau tau] -threshold threshold -spring_constant
+                       spring_constant -trigger_time trigger_time -dwell_time
+                       dwell_time -file_input file_input -file_output
+                       file_output
+
+Predict event locations in a data file
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -tau tau              tau fraction of curve (0,1)
+  -threshold threshold  probability threshold (0,1)
+  -spring_constant spring_constant
+                        spring constant of the probe (N/m)
+  -trigger_time trigger_time
+                        time at which approach ends (s)
+  -dwell_time dwell_time
+                        time between approach end and retract start (s)
+  -file_input file_input
+                        path to the force-extension curve file (string)
+  -file_output file_output
+                        path to output the associated data (string)
+~~~~			
+
+ Using the command line, the output file is always written as a single column, with one event index per line. The following example will create the event indices in the file "output.txt" in the current directory.
+
+~~~~
+python2 main_feather.py
+    -tau 1e-2 \
+    -threshold 1e-3 \
+    -spring_constant 6.67e-3 \
+    -trigger_time 0.382 \
+    -dwell_time 0.992 \
+    -file_input ../Data/example_0.csv \
+    -file_output ./output.txt \
+~~~~
+
+Note that '\\' is the line continuation character. FEATHER accepts the following formats for the input file.
+
+### .pxp (Igor Pro) formatting
 
 - Files ending with '.pxp' with names formatted as below. 
     - These are Igor Pro files, and should have a separation, force, and time wave, named like:
@@ -106,12 +150,36 @@ You can also run FEATHER directly from the command line, as described above. FEA
     - For example, "Image0994Time", "Image0994Sep","Image0994Force".
     - If directly using the example .ipf file, the note must have a string like:
         - "TriggerTime:[number],DwellTime:[number],SpringConstant[numbers]" without quotes, where [number] is a value in SI units (*e.g.* 0.123e-6, without brackets) and the values are respectively the end of the approach, the length of the dwell at the surface before retraction, and the spring constant of the force probe.
-- Files ending with '.mat', formatted like '-v7.3' (see: mathworks.com/help/matlab/ref/save.html#bvmz_n7), with 'time', 'sep', and 'force' data sets. This is essentially an hdf5 file.
-- Files ending with '.csv', where there are three comma-delimited columns of length N, which are the time, separation, and force columns.
-  - If directly using the python or matlab example file, the first line should have a string formatted just as the Igor note described above.
-  - In addition, if using in Matlab, the second line of the file is ignored (assumed to be used to keeping track if events).
 
-All units are assumed SI (seconds, meters, and newtons)
+### .mat (Matlab) formatting
+
+- Files ending with '.mat', formatted like '-v7.3' (see: mathworks.com/help/matlab/ref/save.html#bvmz_n7), with 'time', 'sep', and 'force' data sets. This is essentially an hdf5 file.
+
+### .csv (Generic) formatting
+
+- Files ending with '.csv', where there are three comma-delimited columns of length N, which are the time, separation, and force columns, with the following lines:
+    - Line 1: A literal '#', followed by key-value pairs of experimental information, formatted like 'key:value'.
+        - For example (and most relevant to FEATHER) 'SpringConstant:0.001,DwellTime:0,TriggerTime:1'
+    - Line 2: A literal '#EventIndices,formatted as [[start1,end1],...]:', followed by an csv list of event start and end index pairs, formatted like '[start,end]'
+        - For example, '[[1,2],[7,8]]' means two events, where one events starts at index 1 and stops at 2, and the other starts at 7 and ends at 8.
+        - Note: all indices are zero-offset into the remaining data in the csv file. In other words, index 0 would mean line 3
+    -Line 3 to end: the time, separation, and force as comma-delimited columns. 
+
+## Custom force-extension curves
+
+Some applications (*e.g.* complicated triggering or refolding schemes) may only have a retraction. In this case, a suitable portion of the retraction lacking any events (*e.g.* post-detachment) can be 'pasted' onto the approach. An example of this process is shown in the file AppPython/main_example.py (the function _test_FEATHER_retract_only).
+
+The easiest way to create these custom waves (as demonstrated in the file mentioend above) is as follows:
+
+1. Get the retraction curve
+2. Determine the part of the retraction curve without events (often, the last 10-50 percent), which will be called the 'psuedo' approach
+3. Prepend the 'psuedo' approach to the retraction.
+       - Offset the separation of the 'psuedo' approach so it and the retraction curve have a common zero
+       - Adjust the time so that t=0 at point 0 of the prepended data and continues monotonically
+       - The total length of the new retraction is now greater than it was before
+4. Run FEATHER, with the DwellTime set to 0 and and TriggerTime set to the total length of the 'psuedo' approach
+
+
 	
 ## Troubleshooting
 
