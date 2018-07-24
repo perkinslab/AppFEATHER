@@ -804,7 +804,7 @@ def _zero_fec(example_split,fraction,flip_force=True):
     _set_tau_fec(example_split, fraction)
     # zero out everything to the approach using the autocorrelation time
     zero_by_approach(example_split,
-                     tau_n_approach=example_split.num_points_approach,
+                     tau_n_approach=example_split.tau_num_points_approach,
                      flip_force=flip_force)
     return example_split
 

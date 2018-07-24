@@ -286,6 +286,9 @@ def _no_event_probability(x,interp,y,tau_n,no_event_parameters_object):
             condition = derivative >= 0
         elif no_event_parameters_object.positive_only:
             condition = derivative <= 0
+        else:
+            # everything is OK.
+            condition = np.zeros(probability_distribution.size)
         where_condition = np.where(condition)
         probability_distribution[where_condition] = 1
     """

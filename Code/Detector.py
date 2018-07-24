@@ -183,7 +183,8 @@ def _condition_delta_at_zero(no_event_parameters_object,force,tau_n):
 
 def delta_mask_function(split_fec,slice_to_use,
                         boolean_array,probability,threshold,
-                        no_event_parameters_object,negative_only=True):
+                        no_event_parameters_object):
+    negative_only = no_event_parameters_object.negative_only
     x = split_fec.retract.Time
     force = split_fec.retract.Force
     x_sliced = x[slice_to_use]
@@ -440,7 +441,9 @@ def adhesion_mask_function_for_split_fec(split_fec,slice_to_use,boolean_array,
     # set up the fec and parameters so we are now looking for negatives,
     # using the delta
     no_event_parameters_object._set_valid_delta(True)
-    no_event_parameters_object.negative_only = True
+    # only negative only if *not* only positive
+    neg_only = True if not no_event_parameters_object.positive_only else False
+    no_event_parameters_object.negative_only = neg_only
     if (len(events_containing_surface) == 0):
         interp = no_event_parameters_object.last_interpolator_used
         kw = dict(tau_n=tau_n,
@@ -691,7 +694,8 @@ def make_event_parameters_from_split_fec(split_fec,**kwargs):
     return approach_dict                           
 	
                          
-def _predict_helper(split_fec,threshold,remasking_functions,**kwargs):
+def _predict_helper(split_fec,threshold,remasking_functions,
+                    **kwargs):
     """
     uses spline interpolation and local stadard deviations to predict
     events.
@@ -702,7 +706,8 @@ def _predict_helper(split_fec,threshold,remasking_functions,**kwargs):
         remasking_functions: for remasking...
         threshhold: maximum probability that a given datapoint fits the 
         model
-        
+
+
         kwargs: passed to _predict
     Returns:
         prediction_info object
@@ -716,14 +721,15 @@ def _predict_helper(split_fec,threshold,remasking_functions,**kwargs):
     # any time we make a new splining object, we use the same knots
     split_fec.set_retract_knots(interp_retract)
     # set the epsilon and tau by the approach
-    approach_dict = make_event_parameters_from_split_fec(split_fec,**kwargs)
+    kw_param = dict(negative_only=False,**kwargs)
+    approach_dict = make_event_parameters_from_split_fec(split_fec,**kw_param)
     local_fitter = lambda *_args,**_kwargs: \
                    event_by_loading_rate(*_args,
                                          interpolator=interp_retract,
                                          tau_n=tau_n,
                                          **_kwargs)
     # call the predict function
-    final_kwargs = dict(valid_delta=False,negative_only=False,**approach_dict)
+    final_kwargs = dict(valid_delta=False,**approach_dict)
     to_ret = _predict(x=time,
                       y=force,
                       tau_n=tau_n,
