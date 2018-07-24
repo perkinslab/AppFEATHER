@@ -110,8 +110,6 @@ def _condition_no_delta_significance(no_event_parameters_object,df_true,
     """                                     
     epsilon = no_event_parameters_object.epsilon
     sigma = no_event_parameters_object.sigma
-    epsilon_approach = no_event_parameters_object.delta_epsilon
-    sigma_approach = no_event_parameters_object.delta_sigma
     min_signal = (epsilon+sigma)
     if (negative_only):
         baseline = -min_signal
@@ -164,7 +162,13 @@ def _condition_delta_at_zero(no_event_parameters_object,force,tau_n):
     threshold_local_average = min_sig_df+sigma+epsilon
     baseline_interp = min_sig_df+sigma
     local_average,diff =  f_average_and_diff(force,n=_tau_to_n(tau_n))
-    to_ret = ( (diff >= -baseline_interp) | 
+    if no_event_parameters_object.negative_only:
+        threshold_diff = -baseline_interp
+        condition_diff = diff >= threshold_diff
+    else:
+        threshold_diff = baseline_interp
+        condition_diff = diff <= threshold_diff
+    to_ret = ( condition_diff |
                (local_average <= threshold_local_average))
     """
     plt.subplot(3,1,1)
@@ -173,8 +177,8 @@ def _condition_delta_at_zero(no_event_parameters_object,force,tau_n):
     plt.axhline(threshold_local_average)
     plt.subplot(3,1,2)
     plt.plot(diff)
-    plt.axhline(-baseline_interp)
-    plt.ylim([-5*baseline_interp,5*baseline_interp])
+    plt.axhline(threshold_diff)
+    plt.ylim([-5*threshold_diff,5*threshold_diff])
     plt.subplot(3,1,3)
     plt.plot(to_ret)
     plt.show()
@@ -279,10 +283,7 @@ def delta_mask_function(split_fec,slice_to_use,
     sigma_df = no_event_parameters_object.delta_abs_sigma
     epsilon_df = no_event_parameters_object.delta_abs_epsilon
     deriv_dt= interp_f + (deriv * _deriv_n(tau_n) * dt)
-    if negative_only:
-        deriv_cond_tmp = deriv_dt < sigma_df
-    else:
-        deriv_cond_tmp = np.zeros(interp_f.size)
+    deriv_cond_tmp = deriv_dt < sigma_df
     deriv_cond[slice_to_use] = deriv_cond_tmp
     # XXX debugging...
     df_thresh = np.abs(sigma_df + epsilon_df)
