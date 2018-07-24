@@ -278,8 +278,12 @@ def delta_mask_function(split_fec,slice_to_use,
     consistent_with_zero_cond = np.zeros(boolean_ret.size,dtype=np.bool)
     sigma_df = no_event_parameters_object.delta_abs_sigma
     epsilon_df = no_event_parameters_object.delta_abs_epsilon
-    deriv_cond[slice_to_use] = \
-            interp_f + (deriv * _deriv_n(tau_n) * dt) < sigma_df
+    deriv_dt= interp_f + (deriv * _deriv_n(tau_n) * dt)
+    if negative_only:
+        deriv_cond_tmp = deriv_dt < sigma_df
+    else:
+        deriv_cond_tmp = np.zeros(interp_f.size)
+    deriv_cond[slice_to_use] = deriv_cond_tmp
     # XXX debugging...
     df_thresh = np.abs(sigma_df + epsilon_df)
     average_tmp,diff = f_average_and_diff(force,n=_tau_to_n(tau_n))
@@ -346,6 +350,17 @@ def delta_mask_function(split_fec,slice_to_use,
         consistent_with_zero(boolean_ret,probability_updated,
                              condition_non_events,min_points_between,
                              get_best_slice_func,threshold)
+    """
+    plt.close()
+    plt.subplot(2,1,1)
+    plt.plot(x,force)
+    plt.plot(x_sliced,interp_f)
+    plt.subplot(2,1,2)
+    plt.plot(x,consistent_with_zero_cond,label="zero cond")
+    plt.plot(x,deriv_cond+1.1,label="deriv cond")
+    plt.legend()
+    plt.show()
+    """
     return slice_to_use,boolean_ret,probability_updated
 
 def consistent_with_zero(boolean_ret,probability_updated,condition_non_events,
