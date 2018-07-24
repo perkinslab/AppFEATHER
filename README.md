@@ -7,9 +7,7 @@ This repository contains FEATHER (*F*orce *E*xtension *A*nalysis using a *T*esta
 
 # Citing FEATHER
 
-If you use FEATHER, please use the following citation:
-
-xxx
+If you use FEATHER, please cite the P. Heenan and T. Perkins publication in Biophysical Journal, 2018.
 
 # Video tutorial
 
@@ -21,7 +19,9 @@ The steps in this text document are covered by [this video tutorial](https://www
 
 To install, in git bash (for windows, https://git-scm.com/downloads) or Terminal (Mac/OS X), type in the following:
 
-git clone --recurse-submodules https://github.com/prheenan/AppFEATHER.git
+git clone --recurse-submodules https://github.com/perkinslab/AppFEATHER.git
+
+We recommend using the most update-to-date version of the 'release' branch.
 
 This will install FEATHER to the current directory.  You should see something like the following:
 
