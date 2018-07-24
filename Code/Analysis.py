@@ -710,7 +710,7 @@ def spline_interpolator(tau_x,x,f,knots=None,deg=2):
         step_knots = tau_x
         min_x,max_x = min(x), max(x)
         knots = np.linspace(start=min_x,stop=max_x,
-                            num=np.ceil((max_x-min_x)/step_knots),
+                            num=np.ceil((max_x-min_x)/step_knots)+2,
                             endpoint=True)
     # get the spline of the data
     spline_args = \
@@ -779,7 +779,12 @@ def auto_correlation_tau(x,f_user,deg_autocorrelation=1,
     tau = abs(1/linear_auto_coeffs[0])
     return tau,coeffs,auto
 
-def _zero_fec(example_split,fraction,flip_force=True):
+def _set_tau_fec(example_split,fraction):
+    """
+    :param example_split: split_fec object
+    :param fraction: tau, in fraction of the retract...
+    :return: nothing, sets the parameters for example_split appropriately.
+    """
     approach = example_split.approach
     retract = example_split.retract
     f = approach.Force
@@ -792,11 +797,15 @@ def _zero_fec(example_split,fraction,flip_force=True):
     dZ_ratio = dZ_retr / dZ_appr
     num_points_approach = int(np.ceil(n_approach * fraction * dZ_ratio))
     num_points_retract = int(np.ceil(n_retract * fraction))
-    # zero out everything to the approach using the autocorrelation time
-    zero_by_approach(example_split, tau_n_approach=num_points_approach,
-                     flip_force=flip_force)
     example_split.set_tau_num_points(num_points_retract)
     example_split.set_tau_num_points_approach(num_points_approach)
+
+def _zero_fec(example_split,fraction,flip_force=True):
+    _set_tau_fec(example_split, fraction)
+    # zero out everything to the approach using the autocorrelation time
+    zero_by_approach(example_split,
+                     tau_n_approach=example_split.num_points_approach,
+                     flip_force=flip_force)
     return example_split
 
 def zero_and_split_force_extension_curve(example,fraction=_def_tau_f()):
