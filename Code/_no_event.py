@@ -54,6 +54,7 @@ class no_event_parameters:
                  integral_epsilon=None,integral_sigma=None,
                  valid_delta=True,valid_derivative=True,valid_integral=True,
                  mask_is_conditional=True,negative_only=True,
+                 positive_only=False,
                  delta_abs_epsilon=None,delta_abs_sigma=None,
                  last_interpolator_used=None):
         self.epsilon = epsilon
@@ -77,6 +78,7 @@ class no_event_parameters:
         self._set_valid_integral(valid_integral)
         self.mask_is_conditional = mask_is_conditional
         self.negative_only=negative_only
+        self.positive_only=positive_only
         self.last_interpolator_used = None
     def _set_valid_delta(self,flag):
         self.valid_delta = ((self.delta_epsilon is not None and
@@ -279,10 +281,11 @@ def _no_event_probability(x,interp,y,tau_n,no_event_parameters_object):
         df = _delta(x_s,interpolated_y,n=min_points_between)
         p_delta = _delta_probability(df,no_event_parameters_object)
         probability_distribution *= p_delta        
-    if (no_event_parameters_object.negative_only and 
-        no_event_parameters_object.valid_derivative):
-        deriv_sigma = no_event_parameters_object.derivative_sigma
-        condition = derivative >= 0
+    if (no_event_parameters_object.valid_derivative):
+        if no_event_parameters_object.negative_only:
+            condition = derivative >= 0
+        elif no_event_parameters_object.positive_only:
+            condition = derivative <= 0
         where_condition = np.where(condition)
         probability_distribution[where_condition] = 1
     """
