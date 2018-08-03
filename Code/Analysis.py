@@ -375,14 +375,12 @@ def local_stdev(f,n):
     stackoverflow.com/questions/18419871/
     improving-code-efficiency-standard-deviation-on-sliding-windows
     """
-    mode = 'reflect'
     c1 = local_average(f,n)
     c2 = local_average(f*f,n)
     # sigma^2 = ( <x^2> - <x>^2 )^(1/2), shouldnt dip below 0
     safe_variance = np.maximum(0,c2 - c1*c1)
     stdev = (safe_variance**.5)
     return stdev
-
 
 def filter_fec(obj,n_points):
     to_ret = copy.deepcopy(obj)
