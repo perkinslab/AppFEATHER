@@ -356,6 +356,33 @@ def _event_slices_from_mask(mask,min_points_between):
                     for start,end in zip(event_idx_start,event_idx_end)]    
     return event_slices
 
+def _sliced_from_mask(bool_array,slice_to_use,tau_n):
+    mask = np.where(bool_array)[0]
+    min_points_between = _min_points_between(tau_n=tau_n)
+    if (mask.size > 0):
+        event_slices = _event_slices_from_mask(mask, int(min_points_between))
+    else:
+        event_slices = []
+    event_slices_raw = list(event_slices)
+    # XXX reject events with a very small time?
+    event_duration = [abs(e.stop - e.start) for e in event_slices]
+    delta_split_rem = [int(np.ceil(_delta_n_remainder(tau_n) - (delta // 2)))
+                       for delta in event_duration]
+    # determine where the events are happening locally (guarentee at least
+    # a search window of min_points)
+    # XXX debugging
+    remainder_split = [max(0, d) for d in delta_split_rem]
+    event_slices = [slice(event.start - remainder, event.stop + remainder, 1)
+                    for event, remainder in zip(event_slices, remainder_split)]
+    max_idx = slice_to_use.stop - 1
+    # make sure all the indices are in range.
+    event_slices = [slice(max(0, e.start), min(e.stop, max_idx + 1))
+                    for e in event_slices]
+    # dont look at any events at the end
+    event_slices = [e for e in event_slices
+                    if (e.stop < max_idx - min_points_between and
+                        e.start > slice_to_use.start + min_points_between)]
+    return event_slices, event_slices_raw
 
 def _predict(x,y,tau_n,interp,threshold,local_event_idx_function,
              remasking_functions=None,**kwargs):
@@ -380,7 +407,6 @@ def _predict(x,y,tau_n,interp,threshold,local_event_idx_function,
     Returns:
         list of event slices
     """
-    min_points_between = _min_points_between(tau_n=tau_n)
     no_event_parameters_object = no_event_parameters(threshold=threshold,
                                                      **kwargs)
     probability_distribution,stdevs = \
@@ -409,32 +435,10 @@ def _predict(x,y,tau_n,interp,threshold,local_event_idx_function,
             masks.append(np.where(bool_array)[0])
     # only keep points where we are farther than min_points between from the 
     # edges (ie: from index 0 and N-1)
-    mask = np.where(bool_array)[0]
-    n = mask.size
-    if (mask.size > 0):
-        event_slices = _event_slices_from_mask(mask,int(min_points_between))
-    else:
-        event_slices = []
-    event_slices_raw = list(event_slices)
-    # XXX reject events with a very small time?
-    event_duration = [ abs(e.stop-e.start) for e in event_slices]
-    delta_split_rem = [ int(np.ceil(_delta_n_remainder(tau_n)-(delta//2)))
-                        for delta in event_duration]
-    # determine where the events are happening locally (guarentee at least
-    # a search window of min_points)
-    # XXX debugging 
-    remainder_split = [max(0,d) for d in delta_split_rem ]
-    event_slices = [slice(event.start-remainder,event.stop+remainder,1)
-                    for event,remainder in zip(event_slices,remainder_split)]
-    max_idx = x.size-1
-    # make sure all the indices are in range.
-    event_slices = [slice(max(0,e.start),min(e.stop,max_idx+1))
-                     for e in event_slices]
-    # dont look at any events at the end
-    event_slices = [e for e in event_slices
-                    if (e.stop < max_idx - min_points_between and
-                        e.start > slice_to_use.start + min_points_between)]
-    event_idx = [min(max_idx,local_event_idx_function(x,y,e))
+    max_idx = slice_to_use.stop - 1
+    event_slices, event_slices_raw = \
+        _sliced_from_mask(bool_array,slice_to_use,tau_n)
+    event_idx = [min(max_idx, local_event_idx_function(x, y, e))
                  for e in event_slices]
     # update the probability distribution
     events_final_bool = np.zeros(probability_distribution.size,dtype=np.bool)
