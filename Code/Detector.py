@@ -94,37 +94,7 @@ def safe_reslice(original_boolean,original_probability,condition,
         # pick out the minimum derivative slice within each previous slice
     return new_boolean,new_probability
 
-def _condition_no_delta_significance(no_event_parameters_object,df_true,
-                                     negative_only):
-    """
-    Returns a boolean array, 1 where delta is consistent with zero...
-    
-    Args;
-        no_event_parameters_object: see _condition_delta_at_zero
-        df_true: Change in function 
-        negative_only: if true, only look at negative changes (where positive
-        are returned as 1)
-        
-    Returns;
-        boolean array, 1 where nothing happening 
-    """                                     
-    epsilon = no_event_parameters_object.epsilon
-    sigma = no_event_parameters_object.sigma
-    min_signal = no_event_parameters_object.delta_epsilon + \
-                 no_event_parameters_object.delta_sigma
-    if (negative_only):
-        baseline = -min_signal
-    else:
-        # considering __all__ signal. XXX need absolute value df?
-        baseline = min_signal
-    value_cond = (df_true > baseline)
-    """
-    plt.plot(df_true)
-    plt.axhline(baseline)
-    plt.show()
-    """
-    return value_cond
-    
+
 def f_average_and_diff(force,n):
     """
     Returns the local average and centered difference of force 
@@ -249,11 +219,8 @@ def delta_mask_function(split_fec,slice_to_use,
     plt.show()
     """
     # find where the derivative is definitely not an event
-    value_cond = \
-        _condition_no_delta_significance(no_event_parameters_object,df_true,
-                                         negative_only)
     gt_condition = np.ones(boolean_array.size)
-    gt_condition[slice_to_use] = (value_cond) | (no_event_cond)
+    gt_condition[slice_to_use] = (no_event_cond)
     get_best_slice_func = lambda slice_list: \
         get_slice_by_max_value(interp_f,slice_to_use.start,slice_list)
     # update the boolean array before we slice
@@ -273,7 +240,6 @@ def delta_mask_function(split_fec,slice_to_use,
     plt.xlim(xlim)
     plt.subplot(2, 1, 2)
     plt.plot(x_sliced, boolean_array[slice_to_use] + 2.1)
-    plt.plot(x_sliced, value_cond + 1.1)
     plt.plot(x_sliced, no_event_cond)
     plt.xlim(xlim)
     plt.show()
@@ -311,10 +277,10 @@ def delta_mask_function(split_fec,slice_to_use,
     plt.legend()
     plt.subplot(3,1,3)
     plt.plot(x_sliced,boolean_ret[slice_to_use])
-    plt.plot(x_sliced,change_insignificant,linestyle='--')
-    plt.axvline(x[min_zero_idx],label="min idx")    
+    plt.plot(x_sliced,change_insignificant,linestyle='--',label='Nope')
+    plt.axvline(x[min_zero_idx],label="min")    
     plt.axvline(x[min_zero_idx-min_points_between],linestyle='--',
-                label="min idx - points between")
+                label="min - M")
     plt.xlim(xlim)    
     plt.legend(loc='upper left')
     plt.show()
