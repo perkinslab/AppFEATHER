@@ -160,20 +160,22 @@ def _delta(x,interp_f,n):
 
 def _delta_probability(df,no_event_parameters):
     negative_only=no_event_parameters.negative_only
+    positive_only=no_event_parameters.positive_only
     epsilon = no_event_parameters.epsilon
     sigma = no_event_parameters.sigma
     min_signal = (epsilon+sigma)
     if (negative_only):
         baseline = -min_signal
-    else:
-        # considering __all__ signal. XXX need absolute value df?
+    elif positive_only:
         baseline = min_signal
-        df = np.abs(df)
     df_relative = df-baseline
     # get the pratio probability
-    k_cheby_ratio = df_relative/sigma
+    k_raw = df_relative/sigma
     if negative_only:
-        k_cheby_ratio = np.minimum(k_cheby_ratio,1)
+        k_cheby_ratio = np.minimum(k_raw,1)
+    elif positive_only:
+        # ignore (set P=1) anything <= the baseline
+        k_cheby_ratio = np.maximum(k_raw,-1)
     ratio_probability= _probability_by_cheby_k(k_cheby_ratio)
     return ratio_probability
 
@@ -292,6 +294,7 @@ def _no_event_probability(x,interp,y,tau_n,no_event_parameters_object):
         where_condition = np.where(condition)
         probability_distribution[where_condition] = 1
     """
+    plt.close()
     plt.subplot(2,1,1)
     plt.plot(y)
     plt.plot(interp(x_s))
