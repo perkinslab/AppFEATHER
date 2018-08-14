@@ -110,7 +110,8 @@ def _condition_no_delta_significance(no_event_parameters_object,df_true,
     """                                     
     epsilon = no_event_parameters_object.epsilon
     sigma = no_event_parameters_object.sigma
-    min_signal = (epsilon+sigma)
+    min_signal = no_event_parameters_object.delta_epsilon + \
+                 no_event_parameters_object.delta_sigma
     if (negative_only):
         baseline = -min_signal
     else:
@@ -264,6 +265,7 @@ def delta_mask_function(split_fec,slice_to_use,
                          get_best_slice_func=get_best_slice_func)
     boolean_ret = probability_updated < threshold
     """
+    plt.close()
     xlim = min(x), max(x)
     plt.subplot(2, 1, 1)
     plt.plot(x, force)
@@ -294,6 +296,7 @@ def delta_mask_function(split_fec,slice_to_use,
     min_zero_idx = n-_tau_to_n(tau_n)
     last_greater = np.where(boolean_ret[slice_to_use])[0]
     """
+    plt.close()
     xlim = [min(x_sliced),max(x)]
     plt.subplot(3,1,1)
     plt.plot(x,force)
@@ -302,9 +305,10 @@ def delta_mask_function(split_fec,slice_to_use,
     plt.xlim(xlim)
     plt.subplot(3,1,2)
     plt.plot(x_sliced,diff_abs_sliced)
-    plt.axhline(df_thresh)
+    plt.axhline(df_thresh,label="$\Delta$ threshold")
     plt.axvline(x[min_zero_idx])        
     plt.xlim(xlim)    
+    plt.legend()
     plt.subplot(3,1,3)
     plt.plot(x_sliced,boolean_ret[slice_to_use])
     plt.plot(x_sliced,change_insignificant,linestyle='--')

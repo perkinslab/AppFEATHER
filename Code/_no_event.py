@@ -161,13 +161,13 @@ def _delta(x,interp_f,n):
 def _delta_probability(df,no_event_parameters):
     negative_only=no_event_parameters.negative_only
     positive_only=no_event_parameters.positive_only
-    epsilon = no_event_parameters.epsilon
-    sigma = no_event_parameters.sigma
+    epsilon = no_event_parameters.delta_epsilon
+    sigma = no_event_parameters.delta_sigma
     min_signal = (epsilon+sigma)
     if (negative_only):
-        baseline = -min_signal
+        baseline = -epsilon
     elif positive_only:
-        baseline = min_signal
+        baseline = epsilon
     df_relative = df-baseline
     # get the pratio probability
     k_raw = df_relative/sigma
