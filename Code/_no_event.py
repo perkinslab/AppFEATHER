@@ -356,7 +356,15 @@ def _event_slices_from_mask(mask,min_points_between):
                     for start,end in zip(event_idx_start,event_idx_end)]    
     return event_slices
 
-def _sliced_from_mask(bool_array,slice_to_use,tau_n):
+def _sliced_from_mask(bool_array,slice_to_use,tau_n,enforce_min_length=True):
+    """
+    :param bool_array: list of onces / zeros
+    :param slice_to_use: into the original data, csame absolute offset
+    as bool array; don't allow events to go near the boundaries
+    :param tau_n: tau in number of points
+    :param enforce_min_length: if true, makes sure t he lengths are at least
+    :return:
+    """
     mask = np.where(bool_array)[0]
     min_points_between = _min_points_between(tau_n=tau_n)
     if (mask.size > 0):
@@ -364,16 +372,15 @@ def _sliced_from_mask(bool_array,slice_to_use,tau_n):
     else:
         event_slices = []
     event_slices_raw = list(event_slices)
-    # XXX reject events with a very small time?
-    event_duration = [abs(e.stop - e.start) for e in event_slices]
-    delta_split_rem = [int(np.ceil(_delta_n_remainder(tau_n) - (delta // 2)))
-                       for delta in event_duration]
-    # determine where the events are happening locally (guarentee at least
-    # a search window of min_points)
-    # XXX debugging
-    remainder_split = [max(0, d) for d in delta_split_rem]
-    event_slices = [slice(event.start - remainder, event.stop + remainder, 1)
-                    for event, remainder in zip(event_slices, remainder_split)]
+    event_slices = list(event_slices_raw)
+    if enforce_min_length:
+        event_duration = [abs(e.stop - e.start) for e in event_slices]
+        delta_split_rem = [int(np.ceil(_delta_n_remainder(tau_n) -\
+                                       (delta//2)))
+                           for delta in event_duration]
+        remainder_split = [max(0, d) for d in delta_split_rem]
+        event_slices = [slice(event.start - r, event.stop + r, 1)
+                        for event, r in zip(event_slices, remainder_split)]
     max_idx = slice_to_use.stop - 1
     # make sure all the indices are in range.
     event_slices = [slice(max(0, e.start), min(e.stop, max_idx + 1))
