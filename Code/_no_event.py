@@ -177,6 +177,23 @@ def _delta_probability(df,no_event_parameters):
         # ignore (set P=1) anything <= the baseline
         k_cheby_ratio = np.maximum(k_raw,-1)
     ratio_probability= _probability_by_cheby_k(k_cheby_ratio)
+    """
+    plt.close()
+    ylim = [-4,4]
+    ylim_N = [-3*sigma,3*sigma]
+    plt.subplot(3,1,1)
+    plt.plot(df)
+    plt.axhline(baseline)
+    plt.ylim(ylim_N)
+    plt.subplot(3,1,2)
+    plt.plot(k_cheby_ratio)
+    plt.axhline(1)
+    plt.axhline(-1)
+    plt.ylim(ylim)
+    plt.subplot(3,1,3)
+    plt.plot(ratio_probability)
+    plt.show()
+    """
     return ratio_probability
 
 
@@ -295,18 +312,18 @@ def _no_event_probability(x,interp,y,tau_n,no_event_parameters_object):
         probability_distribution[where_condition] = 1
     """
     plt.close()
-    plt.subplot(2,1,1)
+    plt.subplot(3, 1, 1)
     plt.plot(y)
     plt.plot(interp(x_s))
-    plt.subplot(2,1,2)
-    plt.semilogy(probability_distribution,label="full")
-    plt.semilogy(p_deriv,label='deriv')
-    plt.semilogy(p_int,label='int')
+    plt.subplot(3, 1, 2)
+    plt.semilogy(p_deriv, label='deriv')
+    plt.semilogy(p_int, label='int')
     if (no_event_parameters_object.valid_delta):
-        plt.semilogy(p_delta,label='delta')
-    if (no_event_parameters_object.negative_only):
-        plt.plot(condition+1.1)
+        plt.semilogy(p_delta, label='delta')
+    plt.plot(condition + 1.1)
     plt.legend()
+    plt.subplot(3, 1, 3)
+    plt.semilogy(probability_distribution, label="full")
     plt.show()
     """
     return probability_distribution,stdev_masked
