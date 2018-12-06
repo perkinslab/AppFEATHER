@@ -317,7 +317,7 @@ def delta_mask_function(split_fec,slice_to_use,
             _condition_delta_at_zero(no_event_parameters_object,force_sliced,
                                      tau_n=tau_n)
     condition_non_events = (consistent_with_zero_cond | deriv_cond)
-    boolean_ret, probability_updated = \
+    boolean_ret, probability_final = \
         consistent_with_zero(boolean_ret,probability_updated,
                              condition_non_events,min_points_between,
                              get_best_slice_func,threshold)
@@ -332,7 +332,11 @@ def delta_mask_function(split_fec,slice_to_use,
     plt.legend()
     plt.show()
     """
-    return slice_to_use,boolean_ret,probability_updated
+    if no_event_parameters_object.allow_small_differences:
+        probability_ret = probability_updated
+    else:
+        probability_ret = probability_final
+    return slice_to_use,boolean_ret,probability_ret
 
 def consistent_with_zero(boolean_ret,probability_updated,condition_non_events,
                          min_points_between,get_best_slice_func,threshold):

@@ -56,7 +56,7 @@ class no_event_parameters:
                  mask_is_conditional=True,negative_only=True,
                  positive_only=False,
                  delta_abs_epsilon=None,delta_abs_sigma=None,
-                 last_interpolator_used=None):
+                 last_interpolator_used=None,allow_small_differences=False):
         self.epsilon = epsilon
         self.sigma = sigma
         self.threshold = threshold
@@ -80,6 +80,7 @@ class no_event_parameters:
         self.negative_only=negative_only
         self.positive_only=positive_only
         self.last_interpolator_used = None
+        self.allow_small_differences = allow_small_differences
     def _set_valid_delta(self,flag):
         self.valid_delta = ((self.delta_epsilon is not None and
                             self.delta_sigma is not None) and flag)
