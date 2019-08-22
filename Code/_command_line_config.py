@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys, re
 
-from UtilForce.FEC import FEC_Util
+sys.path.append("../")
 from UtilGeneral import GenUtilities
 from UtilIgor import PxpLoader,TimeSepForceObj
 import h5py
