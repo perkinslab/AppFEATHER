@@ -13,7 +13,7 @@ sys.path.append("../")
 from UtilGeneral import GenUtilities
 from UtilIgor import PxpLoader,TimeSepForceObj
 import h5py
-from Code import Detector
+from . import Detector
 
 
 
