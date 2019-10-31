@@ -165,18 +165,18 @@ def _delta_probability(df,no_event_parameters):
     epsilon = no_event_parameters.delta_epsilon
     sigma = no_event_parameters.delta_sigma
     min_signal = (epsilon+sigma)
-    if (negative_only):
-        baseline = -epsilon
-    elif positive_only:
+    if positive_only:
         baseline = epsilon
+    else:
+        baseline = -epsilon
     df_relative = df-baseline
     # get the pratio probability
     k_raw = df_relative/sigma
-    if negative_only:
-        k_cheby_ratio = np.minimum(k_raw,1)
-    elif positive_only:
+    if positive_only:
         # ignore (set P=1) anything <= the baseline
         k_cheby_ratio = np.maximum(k_raw,-1)
+    else:
+        k_cheby_ratio = np.minimum(k_raw,1)
     ratio_probability= _probability_by_cheby_k(k_cheby_ratio)
     """
     plt.close()
