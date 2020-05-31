@@ -710,7 +710,7 @@ def spline_interpolator(tau_x,x,f,knots=None,deg=2):
         step_knots = tau_x
         min_x,max_x = min(x), max(x)
         knots = np.linspace(start=min_x,stop=max_x,
-                            num=np.ceil((max_x-min_x)/step_knots),
+                            num=int(np.ceil((max_x-min_x)/step_knots)),
                             endpoint=True)
     # get the spline of the data
     spline_args = \
